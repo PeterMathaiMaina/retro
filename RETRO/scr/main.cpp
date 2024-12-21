@@ -1,7 +1,12 @@
 #include <iostream>
+#include "end.h"  
+#include "glfw3.h"
 
 
-int main(){
-    std::cout<<"peter";
-    return 0;
+int main()
+{ 
+    std::string name; 
+    std::cout<<"ENTER YOUR NAME "; std::cin>>name;
+    myfunction(name);
+    return 0;    
 }

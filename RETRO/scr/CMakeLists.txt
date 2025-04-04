@@ -6,7 +6,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 
 # Add the executable
-add_executable(RETRO2025 Main.cpp Graphics/shaderClass.h)
+add_executable(RETRO2025 Graphics/Shader.cpp  Main.cpp)
 
 
 # Link the libraries
@@ -22,7 +22,10 @@ target_include_directories(RETRO2025
     PRIVATE
     ${GLEW_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/scr/Graphics
 )
+
+
 
 # Set C++ standard (if necessary, e.g., C++11)
 set_target_properties(RETRO2025 PROPERTIES

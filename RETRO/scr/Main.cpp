@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
-#include "Graphics/shaderClass.h"
+#include "Graphics/Shader.h"
 
 // Function to compile shaders
 unsigned int compileShader(const char* source, GLenum shaderType) {
@@ -43,38 +43,34 @@ int main(void) {
     }
 
     float vertices[] = {
-          0.0f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  // Bottom-right, Red
-          1.0f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom-left, Green
-          -1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f   // Top, Blue
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // Bottom-right, Red
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom-left, Green
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // Top, Blue
     }; 
 
-    int gret{};
-
-    unsigned int VAO{};
-    unsigned int VBO{};
+    unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Position Attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // Color Attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    
-    Shader TheeShader("/home/ender/MyProject/ENDER-main/scr/Shaders/default.vert", 
-        "/home/ender/MyProject/ENDER-main/scr/Shaders/default.frag");
+
+    Shader ShaderProgram("/home/ender/retro/RETRO/scr/Shaders/default.vert","/home/ender/retro/RETRO/scr/Shaders/default.frag");
 
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
-        TheeShader.use();
+        ShaderProgram.use();
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
@@ -82,6 +78,8 @@ int main(void) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glfwTerminate();

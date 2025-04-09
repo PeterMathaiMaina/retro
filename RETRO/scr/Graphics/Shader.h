@@ -8,9 +8,8 @@
 #include <sstream>
 #include <iostream>
 
-class Shader
+struct Shader
 {
-public:
     unsigned int ID; // Shader program ID
 
     // Constructor generates the shader on the fly

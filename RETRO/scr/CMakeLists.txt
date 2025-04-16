@@ -27,6 +27,7 @@ target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/Graphics
     ${CMAKE_SOURCE_DIR}/Utils
     ${CMAKE_SOURCE_DIR}/Input
+    ${CMAKE_SOURCE_DIR}/Camera
 )
 
 # Set C++ standard
@@ -34,3 +35,4 @@ set_target_properties(RETRO2025 PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES
 )
+

@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "Shader.hpp"
 
 // Constructor that loads, compiles, and links shaders
 Shader::Shader(const char* vertexPath, const char* fragmentPath)

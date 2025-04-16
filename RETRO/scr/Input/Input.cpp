@@ -1,23 +1,36 @@
-#include "Input.h"         // Your class declaration
-#include <iostream>          // For std::cout, std::endl
-#include <GLFW/glfw3.h>      // For glfwGetKey, GLFW_KEY_*, etc.
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include "../Graphics/Shader.hpp"
+#include "../Utils/stb_image.h"
+#include "../glm/glm.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
+#include "../glm/gtc/type_ptr.hpp"
+#include "../Input/Input.hpp"
+#include <iostream>
 
 
-void Input::processInput(GLFWwindow* window, Shader& shader, float& mixture) const
-{
-    if (glfwGetKey(window, GLFW_KEY_TAB ) == GLFW_PRESS)
-    {    
-        std::cout<<"WINDOW CLOSED"<<std::endl;
+void Input::processInput(GLFWwindow* window, Shader& shader,
+                         glm::vec3& cameraPos,  glm::vec3& cameraFront,  glm::vec3& cameraUp,float& deltaTime ,Camera& camera) {
+
+    float cameraSpeed = 15.0f *deltaTime; 
+
+    // Process input
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+        
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        mixture += 0.05f; 
-        //std::cout<<"UP KEY PRESSED"<<std::endl;
-        if (mixture > 1.0f) mixture = 1.0f; 
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        mixture -= 0.05f; 
-        //std::cout<<"DOWN KEY PRESSED"<<std::endl;
-        if (mixture < 0.0f) mixture = 0.0f;         
-    }
+    
+
 }
+

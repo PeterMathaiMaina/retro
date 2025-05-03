@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include "../glm/glm.hpp"
 #include "../glm/gtc/matrix_transform.hpp"
+#include <iostream>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -40,7 +41,7 @@ public:
     float Zoom;
 
     // constructor with vectors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(glm::vec3 position = glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = position;
         WorldUp = up;
@@ -53,15 +54,27 @@ public:
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
-        float velocity = MovementSpeed * deltaTime;
+        float velocity =15.5f * deltaTime;
         if (direction == FORWARD)
             Position += Front * velocity;
+            //std::cout<<Position.x<<'\n';
+            //std::cout<<Position.y<<'\n';
+            //std::cout<<Position.z<<'\n';
         if (direction == BACKWARD)
             Position -= Front * velocity;
+            //std::cout<<Position.x<<'\n';
+            //std::cout<<Position.y<<'\n';
+            //std::cout<<Position.z<<'\n';
         if (direction == LEFT)
             Position -= Right * velocity;
+            //std::cout<<Position.x<<'\n';
+            //std::cout<<Position.y<<'\n';
+            //std::cout<<Position.z<<'\n';
         if (direction == RIGHT)
             Position += Right * velocity;
+            //std::cout<<Position.x<<'\n';
+            //std::cout<<Position.y<<'\n';
+            //std::cout<<Position.z<<'\n';
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -116,6 +129,7 @@ public:
         // returns the view matrix calculated using Euler Angles and the LookAt Matrix
         glm::mat4 GetViewMatrix()
         {
+            
             return glm::lookAt(Position, Position + Front, Up);
         }
 };

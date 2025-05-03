@@ -1,19 +1,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "Input.h"
 #include <iostream>
-#include "../Graphics/Shader.hpp"
-#include "../Utils/stb_image.h"
-#include "../glm/glm.hpp"
-#include "../glm/gtc/matrix_transform.hpp"
-#include "../glm/gtc/type_ptr.hpp"
-#include "../Input/Input.hpp"
+#include "../core/Shader.hpp"
+#include "../../third_party/imageprocessing/stb_image.h"
+#include "../../third_party/glm/glm.hpp"
+#include "../../third_party/glm/gtc/matrix_transform.hpp"
+#include "../../third_party/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
 
 void Input::processInput(GLFWwindow* window, Shader& shader,
                          glm::vec3& cameraPos,  glm::vec3& cameraFront,  glm::vec3& cameraUp,float& deltaTime ,Camera& camera) {
 
-    float cameraSpeed = 15.0f *deltaTime; 
+    float cameraSpeed = 20.2f *deltaTime; 
 
     // Process input
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

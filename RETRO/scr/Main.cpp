@@ -19,7 +19,7 @@
 float lastFrame = 0.0f;
 
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+Camera camera(glm::vec3(0.0f, 2.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastX = 960.0f / 2.0f;
 float lastY = 560.0f / 2.0f;
 bool firstMouse = true;
@@ -46,6 +46,11 @@ int main() {
         return -1;
     }
 
+
+    std::cout<<"IN THIS WORLD WE ARE HELD CAPTIVE BY THE LIMITATIONS OF OUR OWN THOUGHTS. "<<'\n'<<'\n'<<'\n'<<std::endl;
+
+
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -69,11 +74,15 @@ int main() {
 
 
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 1.78f, 0.1f, 100.0f);
-    Model house("/home/mathai/retro/RETRO/rescources/Models/objects/house/Abandoned_House.obj");
+    //Model house("/home/mathai/retro/RETRO/rescources/Models/objects/house/Abandoned_House.obj");
     //Model glock("/home/mathai/retro/RETRO/rescources/Models/objects/Glock/model.dae");
     //Model shotgun("/home/mathai/retro/RETRO/rescources/Models/objects/shotgun/sketchfab_m12.fbx");
     //Model room("/home/mathai/retro/RETRO/rescources/Models/scene/Room/room.obj");
+    //Model chillhouse("/home/mathai/retro/RETRO/rescources/Models/objects/chillhouse/A_peaceful_fantasy_0502051422_texture.fbx");
+    Model Bench("/home/mathai/retro/RETRO/rescources/Models/objects/Bench/13919_Park_Bench_with_Pigeon_V1_l2.obj");
+    Model Mountain("/home/mathai/retro/RETRO/rescources/Models/scene/Terrain/terrain.obj");
     //TextureFromFile("Scene_-_Root_baseColor.jpg","/home/mathai/retro/RETRO/rescources/Models/objects/Backpack");
+
 
     //TextureFromFile("house_color.png","/home/mathai/retro/RETRO/rescources/Models/objects/house");
 
@@ -89,7 +98,14 @@ int main() {
         // 2. Set the transformation matrices
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         // Apply any translations, rotations, and scaling to the modelMatrix here
-        modelShader.setMat4("u_Model", modelMatrix);
+        for (int i = 0 ;i< 5;i++)
+        {
+            modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+            float diff=i*45.5f;
+            modelMatrix = glm::rotate(modelMatrix, glm::radians(diff), glm::vec3(0.0f, 1.0f, 0.0f));
+            modelShader.setMat4("u_Model", modelMatrix);
+        }
+        
 
         glm::mat4 viewMatrix = camera.GetViewMatrix();
         modelShader.setMat4("u_View", viewMatrix);
@@ -97,7 +113,7 @@ int main() {
         glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)16 / (float)9, 0.1f, 100.0f);
         modelShader.setMat4("u_Projection", projectionMatrix);
 
-        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f));
+        glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         modelShader.setMat4("u_scaleMatrix",scaleMatrix);
 
 
@@ -114,7 +130,7 @@ int main() {
         glm::vec3 lightPosition(camera.Position);
         modelShader.setvec3("u_LightPos", lightPosition);
 
-        glm::vec3 lightColor(1.0f,1.0f, 1.0f);
+        glm::vec3 lightColor(1.0f,0.0f, 0.0f);
         modelShader.setvec3("u_LightColor", lightColor);
 
         // 5. Set view position and specular strength
@@ -127,10 +143,23 @@ int main() {
         modelShader.setFloat("light.linear",    0.09f);
         modelShader.setFloat("light.quadratic", 0.032f);	    
         
-        //gun.Draw(modelShader);
-        house.Draw(modelShader);
+        //glock.Draw(modelShader);
+        //room.Draw(modelShader);
         //shotgun.Draw(modelShader);
         //church.Draw(modelShader);
+        //house.Draw(modelShader);
+        Mountain.Draw(modelShader);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.42f,0.27f,3.05f));         // Move to the desired position
+        model = glm::scale(model, glm::vec3(0.01f));      // Scale down to 50%
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate around the Y-axis
+        modelShader.setMat4("u_Model", model);
+
+        Bench.Draw(modelShader);
+        std::cout<<"X: "<<camera.Position.x<<'\n';
+        std::cout<<"Y: "<<camera.Position.y<<'\n';
+        std::cout<<"Z: "<<camera.Position.z<<'\n';
 
         glfwSwapBuffers(window);
         glfwPollEvents();

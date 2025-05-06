@@ -32,8 +32,8 @@ void main()
     vec3 specularColor = specularMapValue.rgb; // Often specular intensity is in the grayscale
 
     // --- Ambient Lighting ---
-    float ambientStrength = 0.05;
-    vec3 ambient = ambientStrength * u_LightColor*attenuation ; // Ambient influenced by diffuse color
+    float ambientStrength = 0.09;
+    vec3 ambient = ambientStrength * u_LightColor ; // Ambient influenced by diffuse color*attenuation
 
     // --- Diffuse Lighting ---
     vec3 normal = normalize(Normal);

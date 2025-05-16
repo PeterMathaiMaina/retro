@@ -2,13 +2,9 @@
 # Material Count: 1
 
 newmtl Material
-Ka 0.0 0.0 0.0       # Ambient color (optional)
-Kd 0.0 1.0 0.0       # Diffuse color (lime)
-Ks 0.5 0.5 0.5       # Specular color (adjust as needed)
-Ns 32.0              # Shininess
-Ke 0.0 0.0 0.0
+Kd 1.0 1.0 1.0       # Diffuse color (lime)
+Ks 0.4 0.4 0.4       # Specular color (adjust as needed)
+Ns 0.0              # Shininess
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd bench_metall_diffuse.jpg
-#map_Ks Ground_normal.png

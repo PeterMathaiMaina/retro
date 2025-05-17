@@ -147,9 +147,14 @@ void main()
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);    
     } 
 
-    //FragColor = vec4(result, 1.0);
+    //FragColor = vec4(0.9,0.4,0.4,1.0);
+    FragColor = vec4 ((result),1.0);
     //FragColor = vec4(FragPos.z,1.0);
     //FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
-    float depth = LinearizeDepth(gl_FragCoord.z) / far; // divide by far for demonstration
-    FragColor = vec4(vec3(depth), 1.0);
+
+    //float depth = (LinearizeDepth(gl_FragCoord.z) / far) ; // divide by far for demonstration
+    //// Optional: normalize linear depth for fog or shading
+    //float fogFactor = clamp((depth - near) / (far - near), 0.0, 1.0);
+    //result = mix(result, vec3(0.0), fogFactor);
+    //FragColor = vec4(vec3(result), 1.0);
 }

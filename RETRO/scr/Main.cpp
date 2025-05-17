@@ -60,7 +60,9 @@ int main() {
     std::cout << "OpenGL Version: " << version << std::endl;
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
     //glDepthFunc(GL_ALWAYS);
+    
     //glDisable(GL_CULL_FACE);
     //const char* peter {"hekfjfsgfi"};
     //std::cout<<peter<<std::endl;
@@ -82,8 +84,10 @@ int main() {
     //};
 
     Model Tree("/home/mathai/retro/RETRO/rescources/Models/objects/Tree/Tree.obj");
+    Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
     //TextureFromFile("Scene_-_Root_baseColor.jpg","/home/mathai/retro/RETRO/rescources/Models/objects/Backpack");
     //TextureFromFile("house_color.png","/home/mathai/retro/RETRO/rescources/Models/objects/house");
+    //Model Lamp("/home/mathai/retro/RETRO/rescources/Models/objects/StreetLamp/StreetLamp.obj");
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
@@ -92,7 +96,8 @@ int main() {
         
         
         input.processInput(window, modelShader, camera.Position, camera.Front, camera.Up, deltaTime, camera);   
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 
         modelShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
         modelShader.setvec3("dirlight.ambient",glm::vec3(0.3f, 0.24f, 0.14f));
@@ -103,8 +108,8 @@ int main() {
         modelShader.setvec3("spotlight.position", camera.Position);
         modelShader.setvec3("spotlight.direction", camera.Front);
         modelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(16.5f)));
-        modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(22.5f)));         
-        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.4f));
+        modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(18.5f)));         
+        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.5f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(1.0f));
         modelShader.setvec3("spotlight.specular", glm::vec3(0.01f));
         modelShader.setFloat("spotlight.constant", 1.0f);
@@ -140,6 +145,7 @@ int main() {
         modelShader.setMat4("u_Projection", projectionMatrix);
         glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         modelShader.setMat4("u_scaleMatrix",scaleMatrix);
+        
 
         // 3. Set the texture samplers
         glActiveTexture(GL_TEXTURE0);
@@ -167,22 +173,22 @@ int main() {
         model = glm::translate(model, glm::vec3( -3.00874f,  -5.30645f,  -4.08654f));         
         model = glm::scale(model, glm::vec3(0.5f));
         modelShader.setMat4("u_Model", model);
-        Tree.Draw(modelShader);            
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3( 0.0f,  0.0f,  0.0f));         
-        model = glm::scale(model, glm::vec3(0.5f));
+        Tree.Draw(modelShader);           
+
+        model = glm::mat4(1.0f); 
+        model = glm::translate(model, glm::vec3( -3.444411f,  -5.0717f,  -3.73829f));         
+        model = glm::scale(model, glm::vec3(0.01));
         modelShader.setMat4("u_Model",model);
-        Tree.Draw(modelShader);
-        //lamp.Draw(modelShader);
+        Gun.Draw(modelShader);
         //model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3( -2.14f,  -5.03f,  -4.19f));         // Move to the desired position
         //model = glm::scale(model, glm::vec3(0.5f));      // Scale down to 50%
         //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate around the Y-axis
         //modelShader.setMat4("u_Model", model);
         //Bench.Draw(modelShader);
-
         //std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
         //glDepthMask(GL_FALSE);
+        glStencilMask(0x00);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

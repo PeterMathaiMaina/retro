@@ -147,8 +147,8 @@ void main()
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);    
     } 
 
-    //FragColor = vec4(0.9,0.4,0.4,1.0);
-    FragColor = vec4 ((result),1.0);
+    FragColor = vec4(0.9,0.4,0.4,1.0);
+    //FragColor = vec4 ((result),1.0);
     //FragColor = vec4(FragPos.z,1.0);
     //FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
 

@@ -20,7 +20,7 @@ float lastFrame = 0.0f;
 bool SpotLightOn = true;
 
 
-Camera camera(glm::vec3(-4.3f,-3.4f, 0.8f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+Camera camera(glm::vec3(-4.3f,-4.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastX = 960.0f / 2.0f;
 float lastY = 560.0f / 2.0f;
 bool firstMouse = true;
@@ -64,7 +64,7 @@ int main() {
     //glDepthFunc(GL_ALWAYS);
 
     Shader modelShader("/home/mathai/retro/RETRO/rescources/Shaders/model.vert","/home/mathai/retro/RETRO/rescources/Shaders/model.frag");
-    Shader lightShader("/home/mathai/retro/RETRO/rescources/Shaders/lighting.vert","/home/mathai/retro/RETRO/rescources/Shaders/lighting.frag");
+    Shader OutlineShader("/home/mathai/retro/RETRO/rescources/Shaders/shaderSingleColor.vert","/home/mathai/retro/RETRO/rescources/Shaders/shaderSingleColor.frag");
 
 
     // Setup input callbacks
@@ -73,17 +73,8 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Input input;
 
-    //glm::vec3 pointLightColors[4] = {
-    //
-    //    glm::vec3(1.0f, 1.0f, 1.0f),  // Green-ish
-    //    glm::vec3(1.0f, 1.0f, 1.0f),  // Blue-ish
-    //    glm::vec3(1.0f, 1.0f, 1.0f)   // Yellow-ish
-    //};
-
     Model Tree("/home/mathai/retro/RETRO/rescources/Models/objects/Tree/Tree.obj");
     Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
-    //TextureFromFile("Scene_-_Root_baseColor.jpg","/home/mathai/retro/RETRO/rescources/Models/objects/Backpack");
-    //TextureFromFile("house_color.png","/home/mathai/retro/RETRO/rescources/Models/objects/house");
     Model Lamp("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
 
     while (!glfwWindowShouldClose(window)) {
@@ -111,6 +102,7 @@ int main() {
         modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
         modelShader.setvec3("spotlight.specular", glm::vec3(0.000000001f));
+
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -146,7 +138,8 @@ int main() {
         glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         modelShader.setMat4("u_scaleMatrix",scaleMatrix);
         //Lamp.Draw(modelShader);
-        
+        glm::vec3 cameraPosition = camera.Position;
+        modelShader.setvec3("u_ViewPos", cameraPosition);        
 
         // 3. Set the texture samplers
         glActiveTexture(GL_TEXTURE0);
@@ -156,34 +149,43 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 1);
         modelShader.setInt("u_SpecularTexture", 1);
-        //Mountain.Draw(modelShader);
-        // 4. Set lighting uniforms
-        //glm::vec3 lightPosition(camera.Position);
-        //modelShader.setvec3("u_LightPos", lightPosition);
-        
-        //glm::vec3 lightColor(1.0f,0.0f, 0.0f);
-        //modelShader.setvec3("u_LightColor", lightColor);
-
-        // 5. Set view position and specular strength
-        glm::vec3 cameraPosition = camera.Position;
-        modelShader.setvec3("u_ViewPos", cameraPosition);
 
 
-        float specularStrength = 0.01f;
-        modelShader.setFloat("u_SpecularStrength", specularStrength);
+
+        //float specularStrength = 0.01f;
+        //modelShader.setFloat("u_SpecularStrength", specularStrength);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3( -3.00874f,  -5.60645f,  -4.08654f));         
-        model = glm::scale(model, glm::vec3(0.4f));
-        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+        //model = glm::translate(model, glm::vec3( -3.00874f,  -5.60645f,  -4.08654f));         
+        //model = glm::scale(model, glm::vec3(0.4f));
+        //model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+        //modelShader.setMat4("u_Model", model);
+        //Tree.Draw(modelShader);      
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);  // Enable stencil write
+            
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.444411f, -5.4717f, -3.73829f));
+        model = glm::scale(model, glm::vec3(0.01f));
         modelShader.setMat4("u_Model", model);
-          
+        Gun.Draw(modelShader);
 
-        Tree.Draw(modelShader);        
+
         model = glm::mat4(1.0f); 
         model = glm::translate(model, glm::vec3( -3.444411f,  -5.4717f,  -3.73829f));         
-        model = glm::scale(model, glm::vec3(0.01));
-        modelShader.setMat4("u_Model",model);
-        Gun.Draw(modelShader);
+        model = glm::scale(model, glm::vec3(0.0000009));
+
+
+        //OutlineShader.setMat4("u_View", viewMatrix);
+        //OutlineShader.setMat4("u_Projection", projectionMatrix);
+        //OutlineShader.setMat4("u_scaleMatrix",scaleMatrix);
+        //OutlineShader.setMat4("U_Model",model);
+        //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // Only draw where stencil is NOT 1
+        //glStencilMask(0x00);                  // Disable writing to stencil buffer
+        //glDisable(GL_DEPTH_TEST);            // Optional: prevent z-fighting
+        //Gun.Draw(OutlineShader);
+        //glStencilMask(0xFF);                // Re-enable stencil writing
+        //glEnable(GL_DEPTH_TEST);           // Re-enable depth testing   
  
         //model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3( -2.14f,  -5.03f,  -4.19f));         // Move to the desired position
@@ -193,7 +195,6 @@ int main() {
         //Bench.Draw(modelShader);
         //std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
         //glDepthMask(GL_FALSE);
-        glStencilMask(0x00);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

@@ -78,6 +78,7 @@ public:
         // draw mesh
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        //std::cout<<"MESH DRAWN"<<'\n';
         glBindVertexArray(0);
     }  
 

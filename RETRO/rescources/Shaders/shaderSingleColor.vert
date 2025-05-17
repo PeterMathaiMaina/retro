@@ -13,13 +13,12 @@ out vec3 FragPos;
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
-uniform mat4 u_scaleMatrix;
 
 void main()
 {
     
     // Calculate the final vertex position
-    vec4 worldPos = u_Model * vec4(aPos, 1.0);
+    vec4 worldPos = u_Model * vec4(aPos, 1.0);//u_scaleMatrix
     gl_Position = u_Projection * u_View * worldPos;
 
     // Pass relevant data to the fragment shader

@@ -62,10 +62,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     //glDepthFunc(GL_ALWAYS);
-    
-    //glDisable(GL_CULL_FACE);
-    //const char* peter {"hekfjfsgfi"};
-    //std::cout<<peter<<std::endl;
+
     Shader modelShader("/home/mathai/retro/RETRO/rescources/Shaders/model.vert","/home/mathai/retro/RETRO/rescources/Shaders/model.frag");
     Shader lightShader("/home/mathai/retro/RETRO/rescources/Shaders/lighting.vert","/home/mathai/retro/RETRO/rescources/Shaders/lighting.frag");
 
@@ -87,16 +84,18 @@ int main() {
     Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
     //TextureFromFile("Scene_-_Root_baseColor.jpg","/home/mathai/retro/RETRO/rescources/Models/objects/Backpack");
     //TextureFromFile("house_color.png","/home/mathai/retro/RETRO/rescources/Models/objects/house");
-    //Model Lamp("/home/mathai/retro/RETRO/rescources/Models/objects/StreetLamp/StreetLamp.obj");
+    Model Lamp("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
         
         
         input.processInput(window, modelShader, camera.Position, camera.Front, camera.Up, deltaTime, camera);   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glStencilFunc(GL_EQUAL, 0 , 0xFF);
 
 
         modelShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
@@ -109,9 +108,9 @@ int main() {
         modelShader.setvec3("spotlight.direction", camera.Front);
         modelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(16.5f)));
         modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(18.5f)));         
-        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.5f));
-        modelShader.setvec3("spotlight.diffuse",  glm::vec3(1.0f));
-        modelShader.setvec3("spotlight.specular", glm::vec3(0.01f));
+        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
+        modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
+        modelShader.setvec3("spotlight.specular", glm::vec3(0.000000001f));
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -122,7 +121,7 @@ int main() {
         for (int i = 0; i < 1; ++i) {
             std::string number = std::to_string(i);
             modelShader.setvec3("pointLights[" + number + "].position",glm::vec3( -3.00159f,  -4.36768f,  -4.08302f));
-            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.0005f);
+            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.00005f);
             modelShader.setvec3("pointLights[" + number + "].diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
             modelShader.setvec3("pointLights[" + number + "].specular", glm::vec3(0.002f));
             // set attenuation
@@ -134,10 +133,11 @@ int main() {
         // 2. Set the transformation matrices
         glm::mat4 modelMatrix = glm::mat4(1.0f);
         modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
-        float diff= 45.5f;
+        float diff= 90.5f;
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(diff), glm::vec3(0.0f, 0.0f, 1.0f));
         modelMatrix = glm::rotate(modelMatrix, glm::radians(diff), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelMatrix = glm::translate(modelMatrix,glm::vec3(-0.35f,-5.19f,-0.25));        
-        //modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f));
+        modelMatrix = glm::translate(modelMatrix,glm::vec3(-0.35f,-1.19f,-6.25));        
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f));
         modelShader.setMat4("u_Model", modelMatrix);
         glm::mat4 viewMatrix = camera.GetViewMatrix();
         modelShader.setMat4("u_View", viewMatrix);
@@ -145,6 +145,7 @@ int main() {
         modelShader.setMat4("u_Projection", projectionMatrix);
         glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.7f, 0.7f, 0.7f));
         modelShader.setMat4("u_scaleMatrix",scaleMatrix);
+        //Lamp.Draw(modelShader);
         
 
         // 3. Set the texture samplers
@@ -167,19 +168,23 @@ int main() {
         glm::vec3 cameraPosition = camera.Position;
         modelShader.setvec3("u_ViewPos", cameraPosition);
 
+
         float specularStrength = 0.01f;
         modelShader.setFloat("u_SpecularStrength", specularStrength);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3( -3.00874f,  -5.30645f,  -4.08654f));         
-        model = glm::scale(model, glm::vec3(0.5f));
+        model = glm::translate(model, glm::vec3( -3.00874f,  -5.60645f,  -4.08654f));         
+        model = glm::scale(model, glm::vec3(0.4f));
+        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
         modelShader.setMat4("u_Model", model);
-        Tree.Draw(modelShader);           
+          
 
+        Tree.Draw(modelShader);        
         model = glm::mat4(1.0f); 
-        model = glm::translate(model, glm::vec3( -3.444411f,  -5.0717f,  -3.73829f));         
+        model = glm::translate(model, glm::vec3( -3.444411f,  -5.4717f,  -3.73829f));         
         model = glm::scale(model, glm::vec3(0.01));
         modelShader.setMat4("u_Model",model);
         Gun.Draw(modelShader);
+ 
         //model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3( -2.14f,  -5.03f,  -4.19f));         // Move to the desired position
         //model = glm::scale(model, glm::vec3(0.5f));      // Scale down to 50%

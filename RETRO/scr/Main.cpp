@@ -20,7 +20,7 @@ float lastFrame = 0.0f;
 bool SpotLightOn = true;
 
 
-Camera camera(glm::vec3(-4.3f,-4.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
+Camera camera(glm::vec3(0.0f,0.3f, 0.3f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastX = 960.0f / 2.0f;
 float lastY = 560.0f / 2.0f;
 bool firstMouse = true;
@@ -60,7 +60,8 @@ int main() {
     std::cout << "OpenGL Version: " << version << std::endl;
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_STENCIL_TEST);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_STENCIL_TEST);
     //glDepthFunc(GL_ALWAYS);
 
     Shader modelShader("/home/mathai/retro/RETRO/rescources/Shaders/model.vert","/home/mathai/retro/RETRO/rescources/Shaders/model.frag");
@@ -79,7 +80,8 @@ int main() {
     Model Lamp("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
 
 
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.1f, 100.0f);
+    glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
+
     modelShader.setMat4("u_Projection", projectionMatrix);
 
     while (!glfwWindowShouldClose(window)) {
@@ -101,10 +103,10 @@ int main() {
         modelShader.setvec3("spotlight.position", camera.Position);
         modelShader.setvec3("spotlight.direction", camera.Front);
         modelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(16.5f)));
-        modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(18.5f)));         
-        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.00002f));
+        modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(30.5f)));         
+        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
-        modelShader.setvec3("spotlight.specular", glm::vec3(0.000000001f));
+        modelShader.setvec3("spotlight.specular", glm::vec3(0.001f));
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -113,7 +115,7 @@ int main() {
         for (int i = 0; i < 1; ++i) {
             std::string number = std::to_string(i);
             modelShader.setvec3("pointLights[" + number + "].position",glm::vec3( -3.00159f,  -4.36768f,  -4.08302f));
-            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.00005f);
+            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.005f);
             modelShader.setvec3("pointLights[" + number + "].diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
             modelShader.setvec3("pointLights[" + number + "].specular", glm::vec3(0.00000002f));
             modelShader.setFloat("pointLights[" + number + "].constant", 1.0f);
@@ -127,8 +129,7 @@ int main() {
 
         glm::vec3 cameraPosition = camera.Position;
         modelShader.setvec3("u_ViewPos", cameraPosition);        
-        float SpecularStrength = 0.5;
-        modelShader.setFloat("u_SpecularStrength",SpecularStrength);
+
 
         // 3. Set the texture samplers
         //diffuse textures
@@ -141,51 +142,35 @@ int main() {
         modelShader.setInt("u_SpecularTexture", 1);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-3.444411f, -7.4717f, -3.73829f));        
-        model = glm::scale(model, glm::vec3(0.000001f));
-        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
-        modelShader.setMat4("u_Model", model);
-
-
-
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-            Tree.Draw(modelShader);       
-        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        //glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        //glStencilMask(0xFF);  // Enable stencil write
-            
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-3.444411f, -5.4717f, -4.73829f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));        
         model = glm::scale(model, glm::vec3(0.1f));
         modelShader.setMat4("u_Model", model);
-        //Gun.Draw(modelShader);
 
+
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass, write 1 to stencil buffer
+        glStencilMask(0xFF); // Enable writing to stencil
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+            Tree.Draw(modelShader);      
+            
+            
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Draw only where stencil != 1
+        glStencilMask(0x00); // Disable stencil writing
+        glDisable(GL_DEPTH_TEST); // Optional: avoid z-fighting
         glm::mat4 ModelMatrix = glm::mat4(1.0); 
-        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-3.444411f, -7.4717f, -3.73829f));
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.2f));
-        ModelMatrix = glm::rotate(ModelMatrix,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.0f,0.0f));
+        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.12f));
         OutlineShader.setMat4("u_View", viewMatrix);
         OutlineShader.setMat4("u_Projection", projectionMatrix);
-        OutlineShader.setMat4("U_Model",ModelMatrix);
-        //Tree.Draw(OutlineShader);
-
-        
-        //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // Only draw where stencil is NOT 1
-        //glStencilMask(0x00);                  // Disable writing to stencil buffer
-        //glDisable(GL_DEPTH_TEST);            // Optional: prevent z-fighting
+        OutlineShader.setMat4("Model_SingleCol",ModelMatrix);
         Tree.Draw(OutlineShader);
-        //glStencilMask(0xFF);                // Re-enable stencil writing
-        
-        //glEnable(GL_DEPTH_TEST);           // Re-enable depth testing   
- 
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3( -2.14f,  -5.03f,  -4.19f));         // Move to the desired position
-        //model = glm::scale(model, glm::vec3(0.5f));      // Scale down to 50%
-        //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate around the Y-axis
-        //modelShader.setMat4("u_Model", model);
-        //Bench.Draw(modelShader);
+        //Gun.Draw(modelShader);
+        glStencilMask(0xFF); // Re-enable stencil writing
+        glEnable(GL_DEPTH_TEST);
+
         std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
-        //glDepthMask(GL_FALSE);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

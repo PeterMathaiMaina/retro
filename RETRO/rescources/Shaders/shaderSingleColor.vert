@@ -18,7 +18,7 @@ void main()
 {
     
     // Calculate the final vertex position
-    vec4 worldPos = u_Model * vec4(aPos, 1.0);//u_scaleMatrix
+    vec4 worldPos = u_Model * vec4(aPos, 1.0);
     gl_Position = u_Projection * u_View * worldPos;
 
     // Pass relevant data to the fragment shader

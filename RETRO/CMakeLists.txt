@@ -37,6 +37,8 @@ target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/textureLoader
     ${CMAKE_SOURCE_DIR}/third_party
     ${CMAKE_SOURCE_DIR}/third_party/glm
+    ${CMAKE_SOURCE_DIR}/third_party/imageprocessing
+    ${CMAKE_SOURCE_DIR}/third_party/imageprocessing/gli
 )
 
 

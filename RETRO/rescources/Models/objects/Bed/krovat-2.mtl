@@ -1,0 +1,91 @@
+# Blender MTL File: 'krovat-2.blend'
+# Material Count: 8
+
+newmtl keovat-2-oldsheet
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.685714 0.685714 0.685714
+Ks 0.241173 0.241173 0.241173
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Bump textures/keovat-2-oldsheet-normals.dds
+map_Kd textures/keovat-2-oldsheet-2.dds
+
+newmtl keovat-2-oldsheet-2
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.685714 0.685714 0.685714
+Ks 0.241173 0.241173 0.241173
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/keovat-2-oldsheet-2.dds
+
+newmtl krovat-2-karkas
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/krovat-2-karkas.dds
+
+newmtl krovat-2-karkas_NONE
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/krovat-2-karkas.dds
+
+newmtl krovat-2-matrac
+Ns 562.745098
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.126236 0.126236 0.126236
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/krovat-2-matrac.dds
+
+newmtl krovat-2-setka
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd textures/krovat-2-setka.dds
+map_d textures/krovat-2-setka.dds
+
+newmtl krovat-2-spinki
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/krovat-2-spinki.dds
+
+newmtl krovat-2-spinki-me
+Ns 839.215686
+Ka 0.171429 0.171429 0.171429
+Kd 0.438535 0.438535 0.438535
+Ks 0.559587 0.559587 0.559587
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 3

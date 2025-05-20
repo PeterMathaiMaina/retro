@@ -138,7 +138,7 @@ void main()
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
 
-    //FragColor = vec4(result, 1.0);
-    // Debug color
     FragColor = vec4(result, 1.0);
+    // Debug color
+    //FragColor = vec4(0.5,0.0,0.0, 1.0);
 }

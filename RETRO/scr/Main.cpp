@@ -7,6 +7,7 @@
 //#include <string>
 #include "core/Shader.hpp"
 #include "../third_party/imageprocessing/stb_image.h"
+#include "../third_party/imageprocessing/gli/gli.hpp"
 #include "../third_party/glm/glm.hpp"
 #include "../third_party/glm/gtc/matrix_transform.hpp"
 #include "../third_party/glm/gtc/type_ptr.hpp"
@@ -75,9 +76,10 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Input input;
 
-    Model Tree("/home/mathai/retro/RETRO/rescources/Models/objects/Tree/Tree.obj");
-    Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
-    Model Lamp("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
+    //Model Tree("/home/mathai/retro/RETRO/rescources/Models/objects/Tree/Tree.obj");
+    //Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
+    Model Bed("/home/mathai/retro/RETRO/rescources/Models/objects/Bed/krovat-2.obj");
+    //Model Pillow("/home/mathai/retro/RETRO/rescources/Models/objects/DirtyPillow/Dirty Pillow.obj");
 
 
     glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
@@ -115,7 +117,7 @@ int main() {
         for (int i = 0; i < 1; ++i) {
             std::string number = std::to_string(i);
             modelShader.setvec3("pointLights[" + number + "].position",glm::vec3( -3.00159f,  -4.36768f,  -4.08302f));
-            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.005f);
+            modelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f, 1.0f, 1.0f) * 0.000005f);
             modelShader.setvec3("pointLights[" + number + "].diffuse", glm::vec3(0.3f, 0.3f, 0.3f));
             modelShader.setvec3("pointLights[" + number + "].specular", glm::vec3(0.00000002f));
             modelShader.setFloat("pointLights[" + number + "].constant", 1.0f);
@@ -142,8 +144,9 @@ int main() {
         modelShader.setInt("u_SpecularTexture", 1);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));        
-        model = glm::scale(model, glm::vec3(0.1f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.1f, 0.0f));        
+        model = glm::scale(model, glm::vec3(0.12f));
+        //model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0,1.0,0.0));
         modelShader.setMat4("u_Model", model);
 
 
@@ -152,24 +155,22 @@ int main() {
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass, write 1 to stencil buffer
         glStencilMask(0xFF); // Enable writing to stencil
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-            Tree.Draw(modelShader);      
-            
-            
+            Bed.Draw(modelShader);      
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Draw only where stencil != 1
         glStencilMask(0x00); // Disable stencil writing
         glDisable(GL_DEPTH_TEST); // Optional: avoid z-fighting
         glm::mat4 ModelMatrix = glm::mat4(1.0); 
-        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.0f,0.0f));
+        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.1f,0.0f));
         ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.12f));
         OutlineShader.setMat4("u_View", viewMatrix);
         OutlineShader.setMat4("u_Projection", projectionMatrix);
         OutlineShader.setMat4("Model_SingleCol",ModelMatrix);
-        Tree.Draw(OutlineShader);
+        //Bed.Draw(modelShader);
         //Gun.Draw(modelShader);
         glStencilMask(0xFF); // Re-enable stencil writing
         glEnable(GL_DEPTH_TEST);
 
-        std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
+        //std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
 
         glfwSwapBuffers(window);
         glfwPollEvents();

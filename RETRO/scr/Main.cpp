@@ -61,12 +61,12 @@ int main() {
     std::cout << "OpenGL Version: " << version << std::endl;
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_STENCIL_TEST);
+    //glDisable(GL_CULL_FACE);
+    //glEnable(GL_STENCIL_TEST);
     //glDepthFunc(GL_ALWAYS);
 
     Shader modelShader("/home/mathai/retro/RETRO/rescources/Shaders/model.vert","/home/mathai/retro/RETRO/rescources/Shaders/model.frag");
-    Shader OutlineShader("/home/mathai/retro/RETRO/rescources/Shaders/shaderSingleColor.vert","/home/mathai/retro/RETRO/rescources/Shaders/shaderSingleColor.frag");
+    Shader OutlineShader("/home/mathai/retro/RETRO/rescources/Shaders/SingleColor.vert","/home/mathai/retro/RETRO/rescources/Shaders/SingleColor.frag");
 
 
 
@@ -76,15 +76,12 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Input input;
 
-    //Model Tree("/home/mathai/retro/RETRO/rescources/Models/objects/Tree/Tree.obj");
-    //Model Gun("/home/mathai/retro/RETRO/rescources/Models/objects/Gun/m4a1_s.obj");
-    Model Bed("/home/mathai/retro/RETRO/rescources/Models/objects/Bed/krovat-2.obj");
-    //Model Pillow("/home/mathai/retro/RETRO/rescources/Models/objects/DirtyPillow/Dirty Pillow.obj");
+    Model Stool("/home/mathai/retro/RETRO/rescources/Models/objects/stool/OCM_stolik_lampa_ksiazka_edit22w.obj");
+    Model Drawer("/home/mathai/retro/RETRO/rescources/Models/objects/Drawer/old_simple_drawer.obj");
+    Model FlatSurface("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
 
 
-    glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
 
-    modelShader.setMat4("u_Projection", projectionMatrix);
 
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
@@ -106,9 +103,9 @@ int main() {
         modelShader.setvec3("spotlight.direction", camera.Front);
         modelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(16.5f)));
         modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(30.5f)));         
-        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
+        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.5f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
-        modelShader.setvec3("spotlight.specular", glm::vec3(0.001f));
+        modelShader.setvec3("spotlight.specular", glm::vec3(0.1f));
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -130,7 +127,11 @@ int main() {
         modelShader.setMat4("u_View", viewMatrix);
 
         glm::vec3 cameraPosition = camera.Position;
-        modelShader.setvec3("u_ViewPos", cameraPosition);        
+        modelShader.setvec3("u_ViewPos", cameraPosition);      
+
+
+        glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
+        modelShader.setMat4("u_Projection", projectionMatrix);  
 
 
         // 3. Set the texture samplers
@@ -143,34 +144,33 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, 1);
         modelShader.setInt("u_SpecularTexture", 1);
 
+              
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.1f, 0.0f));        
-        model = glm::scale(model, glm::vec3(0.12f));
-        //model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0,1.0,0.0));
-        modelShader.setMat4("u_Model", model);
+        model = glm::translate(model, glm::vec3(-0.3f,-0.075f,0.13f));
+        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+        model = glm::scale(model, glm::vec3(0.1f));
+        modelShader.setMat4("u_Model",model);
+        Stool.Draw(modelShader);
 
 
+        model = glm::mat4(1.0f);
+        model =glm::translate(model, glm::vec3(-0.1f,0.0f,0.1f));
+        model = glm::scale(model, glm::vec3(0.04f));
+        modelShader.setMat4("u_Model",model);
+        Drawer.Draw(modelShader);
 
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
-        glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass, write 1 to stencil buffer
-        glStencilMask(0xFF); // Enable writing to stencil
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-            Bed.Draw(modelShader);      
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // Draw only where stencil != 1
-        glStencilMask(0x00); // Disable stencil writing
-        glDisable(GL_DEPTH_TEST); // Optional: avoid z-fighting
-        glm::mat4 ModelMatrix = glm::mat4(1.0); 
-        ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f,0.1f,0.0f));
-        ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.12f));
+
+        model = glm::translate(model, glm::vec3(-0.3f,-0.075f,0.13f));
+        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
+        model = glm::scale(model, glm::vec3(0.1f));
         OutlineShader.setMat4("u_View", viewMatrix);
         OutlineShader.setMat4("u_Projection", projectionMatrix);
-        OutlineShader.setMat4("Model_SingleCol",ModelMatrix);
-        //Bed.Draw(modelShader);
-        //Gun.Draw(modelShader);
-        glStencilMask(0xFF); // Re-enable stencil writing
-        glEnable(GL_DEPTH_TEST);
+        OutlineShader.setMat4("Model_SingleCol",model);
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+            Stool.Draw(OutlineShader);
 
         //std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

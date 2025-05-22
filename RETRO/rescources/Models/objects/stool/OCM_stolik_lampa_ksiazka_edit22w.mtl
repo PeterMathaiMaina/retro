@@ -1,0 +1,22 @@
+# Blender 4.3.0 MTL File: 'OCM_stolik_lampa_ksiazka_edit22w.blend'
+# www.blender.org
+
+newmtl stolik
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd OCM_Biblioteka_lampka_ksiazka_4K_edit06w.dds
+
+newmtl zarowka
+Ns 1000.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 337.000000 163.611740 0.000000
+Ni 1.500000
+d 1.000000
+illum 2

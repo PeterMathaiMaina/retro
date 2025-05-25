@@ -124,6 +124,11 @@ private:
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 
             vertices.push_back(vertex);
+            
+            if (mesh->mMaterialIndex >= scene->mNumMaterials || !scene->mMaterials[mesh->mMaterialIndex]) {
+                std::cerr << "Invalid material index: " << mesh->mMaterialIndex << std::endl;
+                return Mesh(vertices, indices, textures); // return with no textures
+}
         }
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
         for(unsigned int i = 0; i < mesh->mNumFaces; i++)

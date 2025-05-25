@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd OCM_Biblioteka_lampka_ksiazka_4K_edit06w.dds
+map_Kd Base_Color.dds
 
 newmtl zarowka
 Ns 1000.000000
@@ -20,3 +20,4 @@ Ke 337.000000 163.611740 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
+map_Kd Base_Color.dds

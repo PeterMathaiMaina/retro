@@ -17,8 +17,8 @@ enum Camera_Movement {
 // Default camera values
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float SPEED       =  7.5f;
-const float SENSITIVITY =  0.05f;
+const float SPEED       =  5.5f;
+const float SENSITIVITY =  0.03f;
 const float ZOOM        =  45.0f;
 
 
@@ -54,7 +54,7 @@ public:
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
-        float velocity =2.0f * deltaTime;
+        float velocity =0.9f * deltaTime;
         if (direction == FORWARD)    
             Position += Front * velocity;
             //std::cout<<Position.x<<'\n';

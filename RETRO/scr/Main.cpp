@@ -19,6 +19,11 @@
 
 float lastFrame = 0.0f;
 bool SpotLightOn = true;
+using hr_clock = std::chrono::high_resolution_clock;
+auto lastFrameTime = hr_clock::now();
+const double targetFPS = 60.0;
+const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
+
 
 
 Camera camera(glm::vec3(0.0f,0.3f, 0.3f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
@@ -26,15 +31,15 @@ float lastX = 960.0f / 2.0f;
 float lastY = 560.0f / 2.0f;
 bool firstMouse = true;
 float fov = 55.0f;
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-int main() {
+int main(){
     // GLFW initialization
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -60,8 +65,8 @@ int main() {
     const GLubyte* version = glGetString(GL_VERSION);
     std::cout << "OpenGL Version: " << version << std::endl;
     // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    //glDisable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
     //glEnable(GL_STENCIL_TEST);
     //glDepthFunc(GL_ALWAYS);
 
@@ -76,21 +81,23 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Input input;
 
-    Model Stool("/home/mathai/retro/RETRO/rescources/Models/objects/stool/OCM_stolik_lampa_ksiazka_edit22w.obj");
-    Model Drawer("/home/mathai/retro/RETRO/rescources/Models/objects/Drawer/old_simple_drawer.obj");
-    Model FlatSurface("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/Flat Surface.stl");
+    Model Stool("/home/mathai/retro/RETRO/rescources/Models/objects/stool/Stool.gltf");//OCM_stolik_lampa_ksiazka_edit22w
+    Model Drawer("/home/mathai/retro/RETRO/rescources/Models/objects/Drawer/old_simple_drawer.gltf");
+    Model FlatSurface("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/SnowTerrain.obj");
+    Model Bed("/home/mathai/retro/RETRO/rescources/Models/objects/bed/bed.obj");
 
 
 
 
     while (!glfwWindowShouldClose(window)) {
+        auto startTime = hr_clock::now();
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        
-        
         input.processInput(window, modelShader, camera.Position, camera.Front, camera.Up, deltaTime, camera);   
+        //glEnable(GL_DEPTH_TEST);
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         //setting the lighting uniforms
         //directional light
@@ -98,14 +105,10 @@ int main() {
         modelShader.setvec3("dirlight.ambient",glm::vec3(0.3f, 0.24f, 0.14f));
         modelShader.setvec3("dirlight.diffuse",glm::vec3(0.7f, 0.42f, 0.26f));
         modelShader.setvec3("dirlight.specular",glm::vec3(0.5f, 0.5f, 0.5f));
-        //spot-light
-        modelShader.setvec3("spotlight.position", camera.Position);
-        modelShader.setvec3("spotlight.direction", camera.Front);
-        modelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(16.5f)));
-        modelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(30.5f)));         
-        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.5f));
+        //spot-lightauto lastFrameTime = clock::now();uterCutOff", glm::cos(glm::radians(30.5f)));         
+        modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
-        modelShader.setvec3("spotlight.specular", glm::vec3(0.1f));
+        modelShader.setvec3("spotlight.specular", glm::vec3(0.0000001f));
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -134,6 +137,7 @@ int main() {
         modelShader.setMat4("u_Projection", projectionMatrix);  
 
 
+
         // 3. Set the texture samplers
         //diffuse textures
         glActiveTexture(GL_TEXTURE0);
@@ -145,6 +149,12 @@ int main() {
         modelShader.setInt("u_SpecularTexture", 1);
 
               
+
+
+
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
+        //glStencilFunc(GL_ALWAYS, 1, 0xFF); // Always pass, write 1 to stencil buffer
+        //glStencilMask(0xFF); // Enable writing to stencil
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-0.3f,-0.075f,0.13f));
         model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
@@ -155,23 +165,46 @@ int main() {
 
         model = glm::mat4(1.0f);
         model =glm::translate(model, glm::vec3(-0.1f,0.0f,0.1f));
+        model = glm::rotate(model,glm::radians(180.0f),glm::vec3(0.0f,1.0f,0.0f));
+        //model = glm::rotate(model,glm::radians(180.0f),glm::vec3(1.0f,0.0f,0.0f));
         model = glm::scale(model, glm::vec3(0.04f));
         modelShader.setMat4("u_Model",model);
         Drawer.Draw(modelShader);
 
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.3f,-0.0f,0.13f));
+        model = glm::rotate(model,glm::radians(180.0f),glm::vec3(0.0f,1.0f,0.0f));
+        model = glm::rotate(model,glm::radians(180.0f),glm::vec3(1.0f,0.0f,0.0f));
+        model = glm::scale(model, glm::vec3(0.007f));
+        modelShader.setMat4("u_Model",model);
+        //FlatSurface.Draw(modelShader);
 
-        model = glm::translate(model, glm::vec3(-0.3f,-0.075f,0.13f));
-        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0f,1.0f,0.0f));
-        model = glm::scale(model, glm::vec3(0.1f));
-        OutlineShader.setMat4("u_View", viewMatrix);
-        OutlineShader.setMat4("u_Projection", projectionMatrix);
-        OutlineShader.setMat4("Model_SingleCol",model);
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-            Stool.Draw(OutlineShader);
 
+        model=glm::mat4(1.0f);
+        model=glm::scale(model,glm::vec3(0.15f));
+        model=glm::translate(model,glm::vec3(0.0f,-0.5f,2.7f));
+        model = glm::rotate(model,glm::radians(180.0f),glm::vec3(0.0f,1.0f,0.0f));
+        //model = glm::rotate(model,glm::radians(90.0f),glm::vec3(-0.0f,1.0f,0.0f));
+        modelShader.setMat4("u_Model",model);
+        Bed.Draw(modelShader);
+        //glStencilMask(0xFF); // Re-enable stencil writing
+        //glEnable(GL_DEPTH_TEST);
+        
+            // --- Frame limiting ---
+        auto endTime = hr_clock::now();
+        std::chrono::duration<double> elapsed = endTime - startTime;
+        double frameTime = elapsed.count(); 
+
+
+        if (frameTime < targetFrameDuration) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - frameTime));
+        }
         //std::cout<<"X: "<<camera.Position.x<<"Y: "<<camera.Position.y<<"Z: "<<camera.Position.z<<'\n';
 
-
+        lastFrame = currentFrame;
+        if (deltaTime < targetFrameDuration) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - deltaTime));
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

@@ -1,6 +1,6 @@
 # Blender 4.3.0
 # www.blender.org
-mtllib OCM_stolik_lampa_ksiazka_edit22w.mtl
+mtllib Stool.mtl
 o Sphere
 v 0.140163 1.286203 -0.237442
 v 0.140139 1.284340 -0.242994

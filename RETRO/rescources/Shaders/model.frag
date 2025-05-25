@@ -141,5 +141,5 @@ void main()
         
     FragColor = vec4(result, 0.0);
     // Debug color
-    //FragColor = vec4(0.5,0.0,0.0, 1.0);
+    //aFragColor = vec4(0.3, 0.005, 0.005,1.0);
 }

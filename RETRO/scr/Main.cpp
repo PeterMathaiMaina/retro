@@ -85,7 +85,7 @@ int main(){
     Model Drawer("/home/mathai/retro/RETRO/rescources/Models/objects/Drawer/old_simple_drawer.gltf");
     Model FlatSurface("/home/mathai/retro/RETRO/rescources/Models/scene/flat-surface/SnowTerrain.obj");
     Model Bed("/home/mathai/retro/RETRO/rescources/Models/objects/bed/bed.obj");
-
+    Model SceneWindow("/home/mathai/retro/RETRO/rescources/Models/objects/Window/window.obj");
 
 
 
@@ -108,7 +108,7 @@ int main(){
         //spot-lightauto lastFrameTime = clock::now();uterCutOff", glm::cos(glm::radians(30.5f)));         
         modelShader.setvec3("spotlight.ambient",  glm::vec3(0.2f));
         modelShader.setvec3("spotlight.diffuse",  glm::vec3(0.5f));
-        modelShader.setvec3("spotlight.specular", glm::vec3(0.0000001f));
+        modelShader.setvec3("spotlight.specular", glm::vec3(0.7f));
         modelShader.setFloat("spotlight.constant", 1.0f);
         modelShader.setFloat("spotlight.linear", 0.09f);
         modelShader.setFloat("spotlight.quadratic", 0.032f);
@@ -178,6 +178,7 @@ int main(){
         model = glm::scale(model, glm::vec3(0.007f));
         modelShader.setMat4("u_Model",model);
         //FlatSurface.Draw(modelShader);
+        SceneWindow.Draw(modelShader);
 
 
         model=glm::mat4(1.0f);

@@ -1,0 +1,3 @@
+[submodule "RETRO/wlroots"]
+	path = RETRO/wlroots
+	url = https://github.com/swaywm/wlroots.git

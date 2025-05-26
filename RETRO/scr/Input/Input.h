@@ -8,7 +8,7 @@
 
 class Input {
 public:
-    void processInput(GLFWwindow* window, Shader& shader,
+    void processInput(GLFWwindow* window, 
                       glm::vec3& cameraPos, glm::vec3& cameraFront, glm::vec3& cameraUp,float& deltaTime,Camera& camera);
 };
 

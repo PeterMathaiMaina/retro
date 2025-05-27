@@ -8,7 +8,8 @@ find_package(assimp REQUIRED)
 
 
 # Add executable and include stb_image.cpp
-add_executable(RETRO2025 
+add_executable(RETRO2025
+    scr/Renderer/Renderer.cpp
     scr/Main.cpp 
     scr/core/Shader.cpp 
     third_party/imageprocessing/stb_image.cpp  
@@ -30,6 +31,7 @@ target_link_libraries(RETRO2025
 # Include directories (stb_image and other headers)
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
+    ${CMAKE_SOURCE_DIR}/scr/Renderer
     ${CMAKE_SOURCE_DIR}/scr/core
     ${CMAKE_SOURCE_DIR}/scr/graphics
     ${CMAKE_SOURCE_DIR}/scr/Input

@@ -9,13 +9,11 @@
 #include "../../third_party/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
-inline static bool spotlightKeyPressed = false;
-inline static bool spotlightOn = false;
-
 void Input::processInput(GLFWwindow* window,
                          glm::vec3& cameraPos,  glm::vec3& cameraFront,  glm::vec3& cameraUp,float& deltaTime ,Camera& camera) {
 
-    // Process input
+    // Process input WASD
+    
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -26,18 +24,5 @@ void Input::processInput(GLFWwindow* window,
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_PRESS && !spotlightKeyPressed) {
-        spotlightOn = !spotlightOn; // Toggle the spotlight
-        spotlightKeyPressed = true;
-
-        if (spotlightOn) {
-            std::cout << "Spotlight is ON" << std::endl;
-        } else {
-            std::cout << "Spotlight is OFF" << std::endl;
-        }
-    }
-    if (glfwGetKey(window, GLFW_KEY_CAPS_LOCK) == GLFW_RELEASE) {
-        spotlightKeyPressed = false;
-    }
 }
 

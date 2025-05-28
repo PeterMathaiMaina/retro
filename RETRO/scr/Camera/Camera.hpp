@@ -54,28 +54,19 @@ public:
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
-        float velocity =0.9f * deltaTime;
+        float velocity =2.0f * deltaTime;
         if (direction == FORWARD)    
             Position += Front * velocity;
-            //std::cout<<Position.x<<'\n';
-            //std::cout<<Position.y<<'\n';
-            //std::cout<<Position.z<<'\n';
+
         
         if (direction == BACKWARD)
             Position -= Front * velocity;
-            //std::cout<<Position.x<<'\n';
-            //std::cout<<Position.y<<'\n';
-            //std::cout<<Position.z<<'\n';
+
         if (direction == LEFT)
             Position -= Right * velocity;
-            //std::cout<<Position.x<<'\n';
-            //std::cout<<Position.y<<'\n';
-            //std::cout<<Position.z<<'\n';
+
         if (direction == RIGHT)
             Position += Right * velocity;
-            //std::cout<<Position.x<<'\n';
-            //std::cout<<Position.y<<'\n';
-            //std::cout<<Position.z<<'\n';
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

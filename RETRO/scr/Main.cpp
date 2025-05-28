@@ -15,36 +15,26 @@
 #include "graphics/Mesh.hpp"
 #include "../textureLoader/textureLoader.hpp"
 #include "graphics/Model.hpp"
-
 float lastFrame = 0.0f;
-
-
 using hr_clock = std::chrono::high_resolution_clock;
-
 auto lastFrameTime = hr_clock::now();
-
 const double targetFPS = 60.0;
 const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
-
 Camera camera(glm::vec3(0.0f,0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
-
 float lastX = 960.0f / 2.0f;
 float lastY = 560.0f / 2.0f;
-
 bool firstMouse = true;
-
 float fov = 55.0f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
-
-
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
+
+
 int main(){
-    // GLFW initialization
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -62,13 +52,78 @@ int main(){
         std::cerr << "GLEW initialization failed!" << std::endl;
         return -1;
     }
-    const GLubyte* version = glGetString(GL_VERSION);
 
-    // Setup input callbacks
+
+    float cubeVertices[] = 
+    {
+        // positions          // texture Coords
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
+    unsigned int cubeVAO, cubeVBO;
+    glGenVertexArrays(1, &cubeVAO);
+    glGenBuffers(1, &cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glBindVertexArray(0);
+
+    Shader AlphaShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.frag");
+    AlphaShader.use();
+
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     Input input;
+
+    glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
+    //Load the textures 
+    GLuint transparentWindow = TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/scr/SourceTextures");
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
@@ -76,34 +131,52 @@ int main(){
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         input.processInput(window,camera.Position, camera.Front, camera.Up, deltaTime, camera);   
 
-        
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        //SETTING THE MATRICES FOR THE SHADERS
 
+        glm::mat4 viewMatrix = camera.GetViewMatrix();
+        AlphaShader.setMat4("u_View",viewMatrix);
+        AlphaShader.setMat4("u_Projection",projectionMatrix);
+        glm::mat4 ModelMatrix = glm::mat4(1.0f);
+        AlphaShader.setMat4("u_Model",ModelMatrix);
+
+        //SETTING THE TEXTURES FOR THE CUBE OR MODEL & SHADER
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, transparentWindow);  // <- Binds texture 0 (default/none)
+        AlphaShader.setInt("u_DiffuseTexture", 0);
+
+
+        //----------------------------------------RENDERING STARTS HERE--------------------------------------------------------------------------
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+
+
+        //---------------------------------------FRAME CAPPING---------------------------------------------------------
         auto endTime = hr_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
         double frameTime = elapsed.count(); 
-
-
-
-
-
-
         if (frameTime < targetFrameDuration) {
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - frameTime));
         }
-
-
         lastFrame = currentFrame;
         if (deltaTime < targetFrameDuration) {
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - deltaTime));
         }
+
+        //--------------------------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

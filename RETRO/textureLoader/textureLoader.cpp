@@ -65,60 +65,43 @@ unsigned int LoadTextureWithSTB(const std::string& fullPath)
     return textureID;
 }
 
-unsigned int LoadCompressedTexture(const std::string& path)
-{
-    gli::texture tex = gli::load(path);
-    if (tex.empty()) {
-        std::cerr << "Failed to load compressed texture: " << path << std::endl;
+GLuint LoadCompressedTexture(const std::string& path) {
+    gli::texture texture = gli::load(path);
+    if (texture.empty()) {
+        std::cerr << "Failed to load DDS texture: " << path << std::endl;
         return 0;
     }
 
     gli::gl GL(gli::gl::PROFILE_GL33);
-    gli::gl::format format = GL.translate(tex.format(), tex.swizzles());
-    GLenum target = GL.translate(tex.target());
+    gli::gl::format format = GL.translate(texture.format(), texture.swizzles());
 
-    if (target != GL_TEXTURE_2D) {
-        std::cerr << "Unsupported texture target (only GL_TEXTURE_2D is supported currently)." << std::endl;
-        return 0;
-    }
-
-    GLuint texID;
+    GLuint texID = 0;
     glGenTextures(1, &texID);
-    glBindTexture(target, texID);
+    glBindTexture(GL_TEXTURE_2D, texID);
 
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    glm::tvec3<GLsizei> extent(tex.extent());
-    GLsizei levels = static_cast<GLsizei>(tex.levels());
+    glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(texture.levels()),
+                   format.Internal,
+                   static_cast<GLsizei>(texture.extent().x),
+                   static_cast<GLsizei>(texture.extent().y));
 
-    for (std::size_t level = 0; level < tex.levels(); ++level) {
-        GLsizei width = std::max(1, extent.x >> level);
-        GLsizei height = std::max(1, extent.y >> level);
-
-        if (gli::is_compressed(tex.format())) {
-            glCompressedTexImage2D(
-                target,
-                static_cast<GLint>(level),
-                format.Internal,
-                width, height, 0,
-                static_cast<GLsizei>(tex.size(level)),
-                tex.data(0, 0, level)
-            );
-        } else {
-            glTexImage2D(
-                target,
-                static_cast<GLint>(level),
-                format.Internal,
-                width, height, 0,
-                format.External, format.Type,
-                tex.data(0, 0, level)
-            );
-        }
+    for (std::size_t level = 0; level < texture.levels(); ++level) {
+        glCompressedTexSubImage2D(
+            GL_TEXTURE_2D,
+            static_cast<GLint>(level),
+            0, 0,
+            static_cast<GLsizei>(texture.extent(level).x),
+            static_cast<GLsizei>(texture.extent(level).y),
+            format.Internal,
+            static_cast<GLsizei>(texture.size(level)),
+            texture.data(0, 0, level)
+        );
     }
 
-    glBindTexture(target, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     return texID;
 }

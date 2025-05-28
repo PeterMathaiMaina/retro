@@ -100,6 +100,25 @@ int main(){
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
+    float quadVertices[] = {
+        // positions        // texture coords
+        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // top-left
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // bottom-left
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom-right
+
+        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // top-left
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom-right
+         0.5f,  0.5f, 0.0f,  1.0f, 1.0f   // top-right
+    };
+    std::vector<glm::vec3> vegetation = {
+        glm::vec3(-1.5f, 0.0f, -0.48f),
+        glm::vec3(1.5f, 0.0f, 0.51f),
+        glm::vec3(0.0f, 0.0f, 0.7f),
+        glm::vec3(-0.3f, 0.0f, -2.3f),
+        glm::vec3(0.5f, 0.0f, -0.6f)
+    };
+
+
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &cubeVBO);
@@ -111,6 +130,30 @@ int main(){
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+
+
+    unsigned int grassVAO, grassVBO;
+    glGenVertexArrays(1, &grassVAO);
+    glGenBuffers(1, &grassVBO);
+
+    glBindVertexArray(grassVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+    // TexCoord attribute
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glBindVertexArray(0);
+
+
+
+
 
     Shader AlphaShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.frag");
     AlphaShader.use();
@@ -123,7 +166,9 @@ int main(){
 
     glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
     //Load the textures 
-    GLuint transparentWindow = TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/scr/SourceTextures");
+    GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
@@ -132,7 +177,8 @@ int main(){
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
 
 
@@ -160,8 +206,21 @@ int main(){
 
         //----------------------------------------RENDERING STARTS HERE--------------------------------------------------------------------------
         glBindVertexArray(cubeVAO);
+        glBindTexture(GL_TEXTURE_2D, transparentWindow);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+
+        glBindVertexArray(grassVAO);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+
+        for (auto& pos : vegetation) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, pos);
+            AlphaShader.setMat4("u_Model", model); // or however you pass uniforms
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+
+        glBindVertexArray(0);   
 
 
         //---------------------------------------FRAME CAPPING---------------------------------------------------------

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <map>
 #include "core/Shader.hpp"
 #include "../third_party/imageprocessing/stb_image.h"
 #include "../third_party/imageprocessing/gli/gli.hpp"
@@ -110,13 +111,21 @@ int main(){
          0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom-right
          0.5f,  0.5f, 0.0f,  1.0f, 1.0f   // top-right
     };
-    std::vector<glm::vec3> vegetation = {
+    std::vector<glm::vec3> windows = {
         glm::vec3(-1.5f, 0.0f, -0.48f),
         glm::vec3(1.5f, 0.0f, 0.51f),
         glm::vec3(0.0f, 0.0f, 0.7f),
         glm::vec3(-0.3f, 0.0f, -2.3f),
         glm::vec3(0.5f, 0.0f, -0.6f)
     };
+    //vector<glm::vec3> windows
+    //{
+    //    glm::vec3(-1.5f, 0.0f, -0.48f),
+    //    glm::vec3( 1.5f, 0.0f, 0.51f),
+    //    glm::vec3( 0.0f, 0.0f, 0.7f),
+    //    glm::vec3(-0.3f, 0.0f, -2.3f),
+    //    glm::vec3( 0.5f, 0.0f, -0.6f)
+    //};
 
 
     unsigned int cubeVAO, cubeVBO;
@@ -177,8 +186,9 @@ int main(){
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
         glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glFrontFace(GL_CW);
+
 
 
 
@@ -196,32 +206,33 @@ int main(){
         AlphaShader.setMat4("u_Projection",projectionMatrix);
         glm::mat4 ModelMatrix = glm::mat4(1.0f);
         AlphaShader.setMat4("u_Model",ModelMatrix);
-
+        glBindVertexArray(cubeVAO);
+        //SORT THE TRANSPARENT OBJECTS AND DRAW
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);  // <- Binds texture 0 (default/none)
+        AlphaShader.setInt("u_DiffuseTexture", 0);
+        //glBindVertexArray(grassVAO);
+        glDrawArrays(GL_TRIANGLES,0,6);
         //SETTING THE TEXTURES FOR THE CUBE OR MODEL & SHADER
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, transparentWindow);  // <- Binds texture 0 (default/none)
-        AlphaShader.setInt("u_DiffuseTexture", 0);
-
-
+        AlphaShader.setInt("u_DiffuseTexture", 1);
         //----------------------------------------RENDERING STARTS HERE--------------------------------------------------------------------------
-        glBindVertexArray(cubeVAO);
-        glBindTexture(GL_TEXTURE_2D, transparentWindow);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
 
-        glBindVertexArray(grassVAO);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-
-        for (auto& pos : vegetation) {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, pos);
-            AlphaShader.setMat4("u_Model", model); // or however you pass uniforms
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+        std::multimap<float, glm::vec3> sorted;
+        for (unsigned int i = 0; i < windows.size(); i++)
+        {
+            float distance = glm::length(camera.Position - windows[i]);
+            sorted.insert(std::make_pair(distance, windows[i]));
         }
-
-        glBindVertexArray(0);   
-
+        for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) 
+        {
+            ModelMatrix = glm::mat4(1.0f);
+            ModelMatrix = glm::translate(ModelMatrix, it->second);				
+            AlphaShader.setMat4("u_Model", ModelMatrix);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        } 
 
         //---------------------------------------FRAME CAPPING---------------------------------------------------------
         auto endTime = hr_clock::now();

@@ -11,5 +11,5 @@ void main() {
         discard;
 
     FragColor = texColor;
-    //FragColor = vec4(0.2, 0.6, 1.0, 0.3); // Light blue, 30% opaque
+    //FragColor = vec4(0.9, 0.9, 0.9, 0.8); // Light blue, 30% opaque
 }

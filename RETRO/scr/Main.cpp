@@ -177,6 +177,7 @@ int main(){
     //Load the textures 
     GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
     GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint WoodTexture = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
 
 
     while (!glfwWindowShouldClose(window)) {
@@ -209,10 +210,10 @@ int main(){
         glBindVertexArray(cubeVAO);
         //SORT THE TRANSPARENT OBJECTS AND DRAW
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);  // <- Binds texture 0 (default/none)
+        glBindTexture(GL_TEXTURE_2D, WoodTexture);  // <- Binds texture 0 (default/none)
         AlphaShader.setInt("u_DiffuseTexture", 0);
         //glBindVertexArray(grassVAO);
-        glDrawArrays(GL_TRIANGLES,0,6);
+        glDrawArrays(GL_TRIANGLES,0,36);
         //SETTING THE TEXTURES FOR THE CUBE OR MODEL & SHADER
 
         glActiveTexture(GL_TEXTURE1);

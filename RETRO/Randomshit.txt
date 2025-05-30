@@ -116,3 +116,97 @@
         //glStencilMask(0xFF); // Re-enable stencil writing
         //glEnable(GL_DEPTH_TEST);
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        the newest shit 
+
+
+
+
+
+
+
+                glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        glEnable(GL_BLEND);
+        //glEnable(GL_CULL_FACE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glCullFace(GL_BACK);
+        //glFrontFace(GL_CCW);
+        // Enable face culling
+        //glEnable(GL_CULL_FACE);
+        
+
+        // Cull back faces (default and most common)
+        //glCullFace(GL_BACK);
+
+        // Define counter-clockwise winding as front face (also default)
+        //glFrontFace(GL-GL_CW);
+
+
+
+
+ 
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        //SETTING THE MATRICES FOR THE SHADERS
+
+        glm::mat4 viewMatrix = camera.GetViewMatrix();
+        AlphaShader.setMat4("u_View",viewMatrix);
+        AlphaShader.setMat4("u_Projection",projectionMatrix);
+        glm::mat4 ModelMatrix = glm::mat4(1.0f);
+        AlphaShader.setMat4("u_Model",ModelMatrix);
+        glBindVertexArray(cubeVAO);
+        //SORT THE TRANSPARENT OBJECTS AND DRAW
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, WoodTexture);  // <- Binds texture 0 (default/none)
+        AlphaShader.setInt("u_DiffuseTexture", 0);
+        //glBindVertexArray(grassVAO);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        //SETTING THE TEXTURES FOR THE CUBE OR MODEL & SHADER
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, transparentWindow);  // <- Binds texture 0 (default/none)
+        AlphaShader.setInt("u_DiffuseTexture", 1);
+        //----------------------------------------RENDERING STARTS HERE--------------------------------------------------------------------------
+
+        std::multimap<float, glm::vec3> sorted;
+        for (unsigned int i = 0; i < windows.size(); i++)
+        {
+            float distance = glm::length(camera.Position - windows[i]);
+            sorted.insert(std::make_pair(distance, windows[i]));
+        }
+        for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) 
+        {
+            ModelMatrix = glm::mat4(1.0f);
+            ModelMatrix = glm::translate(ModelMatrix, it->second);				
+            AlphaShader.setMat4("u_Model", ModelMatrix);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        } 

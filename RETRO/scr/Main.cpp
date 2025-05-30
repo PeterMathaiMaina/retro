@@ -40,7 +40,7 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    GLFWwindow* window = glfwCreateWindow(950, 600, "RETRO", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1000, 650, "RETRO", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -55,6 +55,10 @@ int main(){
     }
 
 
+    GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint WoodTexture = TextureFromFile("container.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint Wall = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     float cubeVertices[] = 
     {
         // positions          // texture Coords
@@ -101,7 +105,7 @@ int main(){
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    float quadVertices[] = {
+    float QuadVertices[] = {
         // positions        // texture coords
         -0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // top-left
         -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // bottom-left
@@ -111,6 +115,17 @@ int main(){
          0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom-right
          0.5f,  0.5f, 0.0f,  1.0f, 1.0f   // top-right
     };
+    float quadVertices[] = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+        1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        1.0f, -1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f,  1.0f, 1.0f
+    };
+
     std::vector<glm::vec3> windows = {
         glm::vec3(-1.5f, 0.0f, -0.48f),
         glm::vec3(1.5f, 0.0f, 0.51f),
@@ -148,7 +163,7 @@ int main(){
 
     glBindVertexArray(grassVAO);
     glBindBuffer(GL_ARRAY_BUFFER, grassVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(QuadVertices), QuadVertices, GL_STATIC_DRAW);
 
     // Position attribute
     glEnableVertexAttribArray(0);
@@ -160,11 +175,46 @@ int main(){
 
     glBindVertexArray(0);
 
+    unsigned int FBO;
+    glGenFramebuffers(1,&FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER,FBO);
 
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+
+    GLuint rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+
+    unsigned int FrameQuadVOA, FrameQuadVBO;
+    glGenVertexArrays(1, &FrameQuadVOA);
+    glGenBuffers(1, &FrameQuadVBO);
+    glBindVertexArray(FrameQuadVOA);
+    glBindBuffer(GL_ARRAY_BUFFER, FrameQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);    
+    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,4*sizeof(float),nullptr);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4* sizeof(float), (void*)(2 * sizeof(float)));
 
 
 
     Shader AlphaShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.frag");
+    Shader FrameBuffershader("/home/mathai/retro/RETRO/rescources/Shaders/GL_FRAMEBUFFER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_FRAMEBUFFER.frag");
     AlphaShader.use();
 
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -174,66 +224,52 @@ int main(){
     Input input;
 
     glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
-    //Load the textures 
-    GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLuint WoodTexture = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    
 
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
-
-
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_STENCIL_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glFrontFace(GL_CW);
-
-
-
-
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
-        input.processInput(window,camera.Position, camera.Front, camera.Up, deltaTime, camera);   
+        input.processInput(window,camera.Position, camera.Front, camera.Up, deltaTime, camera);     
 
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        //SETTING THE MATRICES FOR THE SHADERS
 
         glm::mat4 viewMatrix = camera.GetViewMatrix();
-        AlphaShader.setMat4("u_View",viewMatrix);
-        AlphaShader.setMat4("u_Projection",projectionMatrix);
-        glm::mat4 ModelMatrix = glm::mat4(1.0f);
-        AlphaShader.setMat4("u_Model",ModelMatrix);
-        glBindVertexArray(cubeVAO);
-        //SORT THE TRANSPARENT OBJECTS AND DRAW
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
+        //// --------------------------- First pass: Render scene to FBO ---------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+
+        // --- Render opaque cube
+        
+        AlphaShader.use();
+        AlphaShader.setMat4("u_Model", model);
+        AlphaShader.setMat4("u_View", viewMatrix);
+        AlphaShader.setMat4("u_Projection", projection);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, WoodTexture);  // <- Binds texture 0 (default/none)
+        glBindTexture(GL_TEXTURE_2D, Wall);
         AlphaShader.setInt("u_DiffuseTexture", 0);
-        //glBindVertexArray(grassVAO);
-        glDrawArrays(GL_TRIANGLES,0,36);
-        //SETTING THE TEXTURES FOR THE CUBE OR MODEL & SHADER
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, transparentWindow);  // <- Binds texture 0 (default/none)
-        AlphaShader.setInt("u_DiffuseTexture", 1);
-        //----------------------------------------RENDERING STARTS HERE--------------------------------------------------------------------------
+        // --------------------------- Second pass: Render to screen ---------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+        glDisable(GL_DEPTH_TEST);
 
-        std::multimap<float, glm::vec3> sorted;
-        for (unsigned int i = 0; i < windows.size(); i++)
-        {
-            float distance = glm::length(camera.Position - windows[i]);
-            sorted.insert(std::make_pair(distance, windows[i]));
-        }
-        for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) 
-        {
-            ModelMatrix = glm::mat4(1.0f);
-            ModelMatrix = glm::translate(ModelMatrix, it->second);				
-            AlphaShader.setMat4("u_Model", ModelMatrix);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-        } 
+        FrameBuffershader.use();
+        float offset = 1.0f / 1000; // or average of width and height
+        FrameBuffershader.use();
+        FrameBuffershader.setFloat("offset", offset);
+
+        glBindVertexArray(FrameQuadVOA); 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        FrameBuffershader.setInt("screenTexture", 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6); 
+
 
         //---------------------------------------FRAME CAPPING---------------------------------------------------------
         auto endTime = hr_clock::now();
@@ -243,20 +279,22 @@ int main(){
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - frameTime));
         }
         lastFrame = currentFrame;
-        if (deltaTime < targetFrameDuration) {
-            std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - deltaTime));
-        }
-
         //--------------------------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteBuffers(1, &cubeVBO);
+    glDeleteVertexArrays(1, &grassVAO);
+    glDeleteBuffers(1, &grassVBO);
+    glDeleteVertexArrays(1, &FrameQuadVOA);
+    glDeleteBuffers(1, &FrameQuadVBO);
+    glDeleteFramebuffers(1, &FBO);
+    glDeleteTextures(1, &texture);
+
     glfwTerminate();
     return 0;
 }
-
-
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (firstMouse) {

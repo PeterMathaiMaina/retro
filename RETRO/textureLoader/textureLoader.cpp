@@ -1,7 +1,6 @@
 #include "../third_party/imageprocessing/stb_image.h"
 #include "../third_party/imageprocessing/gli/gli.hpp"
 #include "../third_party/imageprocessing/gli/gl.hpp"
-
 #include <GL/glew.h>
 #include <iostream>
 #include <string>
@@ -9,12 +8,13 @@
 #include <algorithm>
 #include "textureLoader.hpp"
 
+
 unsigned int TextureFromFile(const char* path, const std::string& directory)
 {
     std::filesystem::path texPath(path);
     std::string fullPath = texPath.is_absolute() ? texPath.string() : (std::filesystem::path(directory) / texPath).string();
 
-    std::cout << "Loading texture from: " << fullPath << std::endl;
+    std::cout <<  fullPath << std::endl;//"Loading texture from: " <<
 
     std::string ext = texPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -22,6 +22,10 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
     if (ext == ".dds" || ext == ".ktx" || ext == ".kmg" || ext == ".basis") {
          return LoadCompressedTexture(fullPath);
     } 
+    //else if (ext==".ktx")
+    //{
+    //    return loadCompressedCubemap(fullPath);
+    //}
     else {
         return LoadTextureWithSTB(fullPath);
     }
@@ -104,3 +108,129 @@ GLuint LoadCompressedTexture(const std::string& path) {
     glBindTexture(GL_TEXTURE_2D, 0);
     return texID;
 }
+
+unsigned int loadKTXCubemap(const std::string& ktxPath) {
+    gli::texture tex = gli::load(ktxPath);
+    if (tex.empty()) {
+        std::cerr << "Failed to load KTX cubemap: " << ktxPath << std::endl;
+        return 0;
+    }
+
+    if (tex.target() != gli::TARGET_CUBE) {
+        std::cerr << "Error: Not a cubemap texture!" << std::endl;
+        return 0;
+    }
+
+    gli::texture_cube texCube(tex);
+    gli::gl GL(gli::gl::PROFILE_GL33);
+    gli::gl::format formatInfo = GL.translate(tex.format(), tex.swizzles());
+
+    GLenum internalFormat = formatInfo.Internal;
+    GLenum externalFormat = formatInfo.External;
+    GLenum type = formatInfo.Type;
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    for (int face = 0; face < 6; ++face) {
+        for (std::size_t level = 0; level < texCube.levels(); ++level) {
+            glm::tvec2<GLsizei> extent = texCube.extent(level);
+            const void* data = texCube.data(0, face, level);
+            GLsizei size = static_cast<GLsizei>(texCube.size(level));
+
+            if (gli::is_compressed(tex.format())) {
+                glCompressedTexImage2D(
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                    static_cast<GLint>(level),
+                    internalFormat,
+                    extent.x, extent.y,
+                    0,
+                    size,
+                    data
+                );
+            } else {
+                glTexImage2D(
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                    static_cast<GLint>(level),
+                    internalFormat,
+                    extent.x, extent.y,
+                    0,
+                    externalFormat,
+                    type,
+                    data
+                );
+            }
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
+
+    std::cout << ktxPath << '\n';
+
+    return textureID;
+}
+unsigned int loadCompressedCubemap(const std::string& ddsPath)
+{
+    gli::texture tex = gli::load(ddsPath);
+    if (tex.empty()) {
+        std::cerr << "Failed to load DDS cubemap: " << ddsPath << std::endl;
+        return 0;
+    }
+
+    gli::texture_cube texCube(tex);
+    gli::gl GL(gli::gl::PROFILE_GL33);
+    gli::gl::format formatInfo = GL.translate(tex.format(), tex.swizzles());
+
+    GLenum internalFormat = formatInfo.Internal;
+    GLenum externalFormat = formatInfo.External;
+    GLenum type = formatInfo.Type;
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    for (int face = 0; face < 6; ++face) {
+        for (std::size_t level = 0; level < texCube.levels(); ++level) {
+            glm::tvec2<GLsizei> extent = texCube.extent(level);
+            const void* data = texCube.data(0, face, level);
+
+            if (gli::is_compressed(tex.format())) {
+                glCompressedTexImage2D(
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                    static_cast<GLint>(level),
+                    internalFormat,
+                    extent.x, extent.y,
+                    0,
+                    static_cast<GLsizei>(texCube.size(level)),
+                    data
+                );
+            } else {
+                glTexImage2D(
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                    static_cast<GLint>(level),
+                    internalFormat,
+                    extent.x, extent.y,
+                    0,
+                    externalFormat,
+                    type,
+                    data
+                );
+            }
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
+

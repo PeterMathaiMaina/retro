@@ -16,6 +16,11 @@
 #include "graphics/Mesh.hpp"
 #include "../textureLoader/textureLoader.hpp"
 #include "graphics/Model.hpp"
+#include "core/CleanUp.hpp"
+
+
+
+
 float lastFrame = 0.0f;
 using hr_clock = std::chrono::high_resolution_clock;
 auto lastFrameTime = hr_clock::now();
@@ -59,6 +64,7 @@ int main(){
     GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
     GLuint WoodTexture = TextureFromFile("container.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     GLuint Wall = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLuint cubeMap  = loadKTXCubemap("/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/skybox.ktx");   
     float cubeVertices[] = 
     {
         // positions          // texture Coords
@@ -68,41 +74,36 @@ int main(){
          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
          0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
          0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
          0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
     };
 
     float QuadVertices[] = {
@@ -125,6 +126,50 @@ int main(){
         1.0f, -1.0f,  1.0f, 0.0f,
         1.0f,  1.0f,  1.0f, 1.0f
     };
+    float skyboxVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
 
     std::vector<glm::vec3> windows = {
         glm::vec3(-1.5f, 0.0f, -0.48f),
@@ -133,15 +178,16 @@ int main(){
         glm::vec3(-0.3f, 0.0f, -2.3f),
         glm::vec3(0.5f, 0.0f, -0.6f)
     };
-    //vector<glm::vec3> windows
-    //{
-    //    glm::vec3(-1.5f, 0.0f, -0.48f),
-    //    glm::vec3( 1.5f, 0.0f, 0.51f),
-    //    glm::vec3( 0.0f, 0.0f, 0.7f),
-    //    glm::vec3(-0.3f, 0.0f, -2.3f),
-    //    glm::vec3( 0.5f, 0.0f, -0.6f)
-    //};
+    std::vector<std::string> faces = {
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/back.dds",
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/front.dds",
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/bottom.dds",
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/left.dds",
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/right.dds",
+        "/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/top.dds"
+    };
 
+    //unsigned int cubemapTexture = loadCompressedCubemap(faces);
 
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -156,6 +202,26 @@ int main(){
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
 
+
+    //unsigned int SkyBoxVOA, SkyBoxVBO;
+    //glGenVertexArrays(1,&SkyBoxVOA);
+    //glGenBuffers(1,&SkyBoxVBO);
+    //glBindVertexArray(SkyBoxVOA);
+    //glBindBuffer(GL_ARRAY_BUFFER,SkyBoxVBO);
+    //glBufferData(GL_ARRAY_BUFFER,sizeof(skyboxVertices),skyboxVertices,GL_STATIC_DRAW);
+    //glEnableVertexAttribArray(0);    
+    //glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),nullptr);
+    //glBindBuffer(GL_ARRAY_BUFFER,0);
+    //glBindVertexArray(0);
+
+    unsigned int skyboxVAO, skyboxVBO;
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
     unsigned int grassVAO, grassVBO;
     glGenVertexArrays(1, &grassVAO);
@@ -210,12 +276,17 @@ int main(){
     glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,4*sizeof(float),nullptr);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4* sizeof(float), (void*)(2 * sizeof(float)));
+    glBindVertexArray(0);
+
+
+
 
 
 
     Shader AlphaShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_ALPHA_SHADER.frag");
     Shader FrameBuffershader("/home/mathai/retro/RETRO/rescources/Shaders/GL_FRAMEBUFFER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_FRAMEBUFFER.frag");
-    AlphaShader.use();
+    Shader SkyBox_shader("/home/mathai/retro/RETRO/rescources/Shaders/GL_SKYBOX_SHADER.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_SKYBOX_SHADER.frag");
+    //AlphaShader.use();
 
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -223,52 +294,67 @@ int main(){
 
     Input input;
 
-    glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
-    
-
+    //glm::mat4 projectionMatrix=glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
-        input.processInput(window,camera.Position, camera.Front, camera.Up, deltaTime, camera);     
+        input.processInput(window,camera.Position, camera.Front, camera.Up, deltaTime, camera);
+             
 
-
-        glm::mat4 viewMatrix = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 100.0f);
-        //// --------------------------- First pass: Render scene to FBO ---------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),800.0f / 600.0f,0.1f, 100.0f);
+        // --------------------------- First pass: Render scene to FBO ---------------------------
+        //glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
+        //glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glEnable(GL_DEPTH_TEST);
 
         // --- Render opaque cube
         
-        AlphaShader.use();
-        AlphaShader.setMat4("u_Model", model);
-        AlphaShader.setMat4("u_View", viewMatrix);
-        AlphaShader.setMat4("u_Projection", projection);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, Wall);
-        AlphaShader.setInt("u_DiffuseTexture", 0);
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //AlphaShader.use();
+        //AlphaShader.setMat4("u_Model", model);
+        //AlphaShader.setMat4("u_View", camera.GetViewMatrix());
+        //AlphaShader.setMat4("u_Projection", projection);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, Wall);
+        //AlphaShader.setInt("u_DiffuseTexture", 0);
+        //glBindVertexArray(cubeVAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // --------------------------- Second pass: Render to screen ---------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); 
-        glDisable(GL_DEPTH_TEST);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+        //glDisable(GL_DEPTH_TEST);
 
-        FrameBuffershader.use();
-        float offset = 1.0f / 1000; // or average of width and height
-        FrameBuffershader.use();
-        FrameBuffershader.setFloat("offset", offset);
+        //FrameBuffershader.use();
+        //float offset = 1.0f / 1000; // or average of width and height
+        //FrameBuffershader.use();
+        //FrameBuffershader.setFloat("offset", offset);
 
-        glBindVertexArray(FrameQuadVOA); 
+        //glBindVertexArray(FrameQuadVOA); 
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, texture);
+        //FrameBuffershader.setInt("screenTexture", 0);
+        //glDrawArrays(GL_TRIANGLES, 0, 6); 
+        //glBindVertexArray(0);
+
+
+
+        // draw skybox as last
+        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        SkyBox_shader.use();
+        glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        SkyBox_shader.setMat4("view", view);
+        SkyBox_shader.setMat4("projection", projection);
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        FrameBuffershader.setInt("screenTexture", 0);
-        glDrawArrays(GL_TRIANGLES, 0, 6); 
+        glBindTexture(GL_TEXTURE_CUBE_MAP, WoodTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+
 
 
         //---------------------------------------FRAME CAPPING---------------------------------------------------------
@@ -279,19 +365,15 @@ int main(){
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - frameTime));
         }
         lastFrame = currentFrame;
-        //--------------------------------------------------------------------------------------------------
+        //--------------------------------------------------------------------------FrameQuadVOA------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteBuffers(1, &cubeVBO);
-    glDeleteVertexArrays(1, &grassVAO);
-    glDeleteBuffers(1, &grassVBO);
-    glDeleteVertexArrays(1, &FrameQuadVOA);
-    glDeleteBuffers(1, &FrameQuadVBO);
-    glDeleteFramebuffers(1, &FBO);
-    glDeleteTextures(1, &texture);
-
+    GL_cleanUp::cleanup_array_buffer(cubeVAO,cubeVBO);
+    GL_cleanUp::cleanup_array_buffer(grassVAO,grassVBO);
+    GL_cleanUp::cleanup_array_buffer(FrameQuadVOA,FrameQuadVBO);
+    GL_cleanUp::cleanup_array_buffer(skyboxVAO,skyboxVBO);
+    
     glfwTerminate();
     return 0;
 }

@@ -17,7 +17,9 @@ add_executable(RETRO2025
     scr/Camera/Camera.hpp
     scr/graphics/Mesh.hpp
     scr/graphics/Model.hpp
+    scr/core/CleanUp.hpp   
     textureLoader/textureLoader.cpp
+
 )
 
 # Link the required libraries

@@ -43,7 +43,7 @@ void main()
 
 
 
-void main2()
+void main23()
 {
     FragColor = texture(screenTexture, TexCoords);
     float average = 0.2126 * FragColor.r + 0.7152 * FragColor.g + 0.0722 * FragColor.b;

@@ -19,14 +19,15 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
     std::string ext = texPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    if (ext == ".dds" || ext == ".ktx" || ext == ".kmg" || ext == ".basis") {
-         return LoadCompressedTexture(fullPath);
-    } 
-    //else if (ext==".ktx")
-    //{
-    //    return loadCompressedCubemap(fullPath);
-    //}
-    else {
+    if (ext == ".dds" || ext == ".ktx") {
+        gli::texture tex = gli::load(fullPath);
+        if (tex.target() == gli::TARGET_CUBE) {
+            return loadKTXCubemap(fullPath);
+        } else {
+            return LoadCompressedTexture(fullPath); // For 2D compressed textures
+        }
+    }
+    else{
         return LoadTextureWithSTB(fullPath);
     }
 }
@@ -108,7 +109,6 @@ GLuint LoadCompressedTexture(const std::string& path) {
     glBindTexture(GL_TEXTURE_2D, 0);
     return texID;
 }
-
 unsigned int loadKTXCubemap(const std::string& ktxPath) {
     gli::texture tex = gli::load(ktxPath);
     if (tex.empty()) {
@@ -116,8 +116,8 @@ unsigned int loadKTXCubemap(const std::string& ktxPath) {
         return 0;
     }
 
-    if (tex.target() != gli::TARGET_CUBE) {
-        std::cerr << "Error: Not a cubemap texture!" << std::endl;
+    if (tex.target() != gli::TARGET_CUBE || tex.faces() != 6 || tex.layers() != 1) {
+        std::cerr << "Error: Not a valid cubemap texture!" << std::endl;
         return 0;
     }
 
@@ -169,68 +169,11 @@ unsigned int loadKTXCubemap(const std::string& ktxPath) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    
+
+    if (texCube.levels() == 1) {
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    }
 
     std::cout << ktxPath << '\n';
-
     return textureID;
 }
-unsigned int loadCompressedCubemap(const std::string& ddsPath)
-{
-    gli::texture tex = gli::load(ddsPath);
-    if (tex.empty()) {
-        std::cerr << "Failed to load DDS cubemap: " << ddsPath << std::endl;
-        return 0;
-    }
-
-    gli::texture_cube texCube(tex);
-    gli::gl GL(gli::gl::PROFILE_GL33);
-    gli::gl::format formatInfo = GL.translate(tex.format(), tex.swizzles());
-
-    GLenum internalFormat = formatInfo.Internal;
-    GLenum externalFormat = formatInfo.External;
-    GLenum type = formatInfo.Type;
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    for (int face = 0; face < 6; ++face) {
-        for (std::size_t level = 0; level < texCube.levels(); ++level) {
-            glm::tvec2<GLsizei> extent = texCube.extent(level);
-            const void* data = texCube.data(0, face, level);
-
-            if (gli::is_compressed(tex.format())) {
-                glCompressedTexImage2D(
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                    static_cast<GLint>(level),
-                    internalFormat,
-                    extent.x, extent.y,
-                    0,
-                    static_cast<GLsizei>(texCube.size(level)),
-                    data
-                );
-            } else {
-                glTexImage2D(
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                    static_cast<GLint>(level),
-                    internalFormat,
-                    extent.x, extent.y,
-                    0,
-                    externalFormat,
-                    type,
-                    data
-                );
-            }
-        }
-    }
-
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return textureID;
-}
-

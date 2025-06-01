@@ -304,40 +304,40 @@ int main(){
              
 
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f),800.0f / 600.0f,0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),1000.0f / 650.0f,0.1f, 100.0f);
         // --------------------------- First pass: Render scene to FBO ---------------------------
-        //glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
-        //glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glEnable(GL_DEPTH_TEST);
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO); 
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
         // --- Render opaque cube
         
-        //AlphaShader.use();
-        //AlphaShader.setMat4("u_Model", model);
-        //AlphaShader.setMat4("u_View", camera.GetViewMatrix());
-        //AlphaShader.setMat4("u_Projection", projection);
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, Wall);
-        //AlphaShader.setInt("u_DiffuseTexture", 0);
-        //glBindVertexArray(cubeVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        AlphaShader.use();
+        AlphaShader.setMat4("u_Model", model);
+        AlphaShader.setMat4("u_View", camera.GetViewMatrix());
+        AlphaShader.setMat4("u_Projection", projection);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, Wall);
+        AlphaShader.setInt("u_DiffuseTexture", 0);
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // --------------------------- Second pass: Render to screen ---------------------------
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0); 
-        //glDisable(GL_DEPTH_TEST);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+        glDisable(GL_DEPTH_TEST);
 
-        //FrameBuffershader.use();
-        //float offset = 1.0f / 1000; // or average of width and height
-        //FrameBuffershader.use();
-        //FrameBuffershader.setFloat("offset", offset);
+        FrameBuffershader.use();
+        float offset = 1.0f / 1000; // or average of width and height
+        FrameBuffershader.use();
+        FrameBuffershader.setFloat("offset", offset);
 
-        //glBindVertexArray(FrameQuadVOA); 
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, texture);
-        //FrameBuffershader.setInt("screenTexture", 0);
-        //glDrawArrays(GL_TRIANGLES, 0, 6); 
-        //glBindVertexArray(0);
+        glBindVertexArray(FrameQuadVOA); 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        FrameBuffershader.setInt("screenTexture", 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6); 
+        glBindVertexArray(0);
 
 
 
@@ -350,7 +350,7 @@ int main(){
         // skybox cube
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, WoodTexture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         glDepthFunc(GL_LESS); // set depth function back to default

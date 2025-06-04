@@ -1,8 +1,11 @@
     // Enable depth test
     //glEnable(GL_DEPTH_TEST);
     //glDisable(GL_CULL_FACE);
-    //glEnable(GL_STENCIL_TEST);
-    //glDepthFunc(GL_ALWAYS);
+    //glEnable(GL_STENCIL_TEST)
+
+ 		glm::mat4("PETER");
+
+//glDepthFunc(GL_ALWAYS);
 
     //Shader modelShader("/home/mathai/retro/RETRO/rescources/Shaders/model.vert","/home/mathai/retro/RETRO/rescources/Shaders/model.frag");
     //Shader OutlineShader("/home/mathai/retro/RETRO/rescources/Shaders/SingleColor.vert","/home/mathai/retro/RETRO/rescources/Shaders/SingleColor.frag");
@@ -210,3 +213,47 @@
             AlphaShader.setMat4("u_Model", ModelMatrix);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            unsigned int FBO;
+    glGenFramebuffers(1,&FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER,FBO);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+
+    GLuint rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+    glBindVertexArray(0);

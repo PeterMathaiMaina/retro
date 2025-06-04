@@ -9,8 +9,7 @@
 #include "../../third_party/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
-void Input::processInput(GLFWwindow* window,
-                         glm::vec3& cameraPos,  glm::vec3& cameraFront,  glm::vec3& cameraUp,float& deltaTime ,Camera& camera) {
+void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera) {
 
     // Process input WASD
     

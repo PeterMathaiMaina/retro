@@ -1,0 +1,11 @@
+Model Information:
+* title:	soviet table
+* source:	https://sketchfab.com/3d-models/soviet-table-a516f8223a154f76b4280e5fdc7b91c4
+* author:	Slepa (https://sketchfab.com/Slepskiy)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "soviet table" (https://sketchfab.com/3d-models/soviet-table-a516f8223a154f76b4280e5fdc7b91c4) by Slepa (https://sketchfab.com/Slepskiy) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

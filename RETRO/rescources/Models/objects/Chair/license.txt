@@ -1,0 +1,11 @@
+Model Information:
+* title:	soviet chair
+* source:	https://sketchfab.com/3d-models/soviet-chair-f7050c1479354ddba20211c2a0898885
+* author:	Slepa (https://sketchfab.com/Slepskiy)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "soviet chair" (https://sketchfab.com/3d-models/soviet-chair-f7050c1479354ddba20211c2a0898885) by Slepa (https://sketchfab.com/Slepskiy) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -31,10 +31,35 @@ public:
     // draws the model, and thus all its meshes
     void Draw(Shader &shader)
     {
+        shader.use();
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
-    
+    void Translate(Shader &shader,glm::mat4 &Model,glm::vec3 Position)
+    {
+            Model= glm::translate(Model , Position);
+            shader.setMat4("u_Model",Model);
+        
+    }
+    void RotateX(Shader& shader, glm::mat4& model, float &angle) {
+        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        shader.setMat4("u_Model", model);
+
+    }
+
+    void RotateY(Shader& shader, glm::mat4& model, float &angle) {
+        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        shader.setMat4("u_Model", model);
+    }  
+
+    void RotateZ(Shader& shader, glm::mat4& model, float &angle) {
+        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        shader.setMat4("u_Model", model);
+    }
+    void Scale(Shader& shader,glm::mat4 model,float &ScaleFactor){
+        model = glm::scale(model,glm::vec3(ScaleFactor));
+        shader.setMat4("u_Model",model);
+    }
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)

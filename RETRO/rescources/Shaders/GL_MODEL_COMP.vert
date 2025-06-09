@@ -13,7 +13,7 @@ uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 
-void main()
+void main  ()
 {
     vec4 worldPos = u_Model * vec4(aPos, 1.0);
     FragPos = vec3(worldPos);
@@ -21,4 +21,9 @@ void main()
     TexCoords = aTexCoords.xy;
 
     gl_Position = u_Projection * u_View * worldPos;
+}
+void main2()
+{
+    gl_Position = u_Projection * u_View * u_Model * vec4(aPos, 1.0);    
+    gl_PointSize = gl_Position.z;    
 }

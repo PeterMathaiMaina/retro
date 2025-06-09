@@ -25,7 +25,7 @@
 float lastFrame = 0.0f;
 using hr_clock = std::chrono::high_resolution_clock;
 auto lastFrameTime = hr_clock::now();
-const double targetFPS = 60.0;
+const double targetFPS = 90.0;
 const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
 Camera camera(glm::vec3(0.0f,0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastX = 960.0f / 2.0f;
@@ -61,13 +61,14 @@ int main(){
     }
 
 
-    GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLuint WoodTexture = TextureFromFile("container.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLuint Wall = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    //GLuint  grassTexture= TextureFromFile("grass.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    //GLuint transparentWindow= TextureFromFile("blending_transparent_window.dds", "/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    //GLuint WoodTexture = TextureFromFile("container.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    //GLuint Wall = TextureFromFile("SecondWall.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     //GLuint cubeMap  = loadKTXCubemap("/home/mathai/retro/RETRO/rescources/textures/Compressed/skybox/skybox.ktx");   
     Model Chair("/home/mathai/retro/RETRO/rescources/Models/objects/Chair/scene.gltf");
     Model Table("/home/mathai/retro/RETRO/rescources/Models/objects/Table/scene.gltf");
+    Model Office("/home/mathai/retro/RETRO/rescources/Models/scene/office/scene.gltf");
 
 
     float cubeVertices[] = {
@@ -217,10 +218,10 @@ int main(){
          1.0f, -1.0f,  1.0f
     };
     glm::vec3 pointLightPositions[] = {
-    glm::vec3(-3.0f,  0.0f, -3.0f),
-    glm::vec3( 3.0f,  0.0f, -3.0f),
-    glm::vec3(-3.0f,  0.0f,  3.0f),
-    glm::vec3( 3.0f,  0.0f,  3.0f)
+    glm::vec3(0.0f,  0.0f, 5.0f),
+    glm::vec3(0.0f,  5.0f, 0.0f),
+    glm::vec3(5.0f,  0.0f, 5.0f),
+    glm::vec3(0.0f,  0.0f, -5.0f)
     };
 
 
@@ -269,6 +270,7 @@ int main(){
     //AlphaShader.use();
 
     glfwSetCursorPosCallback(window, mouse_callback);
+    framebuffer_size_callback(window,1000,650);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -286,41 +288,40 @@ int main(){
         
         input.processInput(window,deltaTime,camera);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model,glm::vec3(1.0f,1.0f,1.0f));  
+        //glm::mat4 model = glm::mat4(1.0f);
+        //model = glm::translate(model,glm::vec3(1.0f,1.0f,1.0f));  
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1000.0f / 650.0f, 0.1f, 500.0f);
 
 
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_PROGRAM_POINT_SIZE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-         ModelShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-        ModelShader.setvec3("dirlight.ambient", glm::vec3(0.3f, 0.24f, 0.14f));
-        ModelShader.setvec3("dirlight.diffuse", glm::vec3(0.7f, 0.42f, 0.26f));
-        ModelShader.setvec3("dirlight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        ModelShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        ModelShader.setvec3("dirlight.ambient", glm::vec3(0.4f, 0.4f, 0.4f));
+        ModelShader.setvec3("dirlight.diffuse", glm::vec3(0.001f, 0.01f, 0.001f));
+        ModelShader.setvec3("dirlight.specular", glm::vec3(0.01f, 0.01f, 0.001f));
 
 
 
-        ModelShader.setvec3("spotlight.ambient", glm::vec3(0.2f));
-        ModelShader.setvec3("spotlight.diffuse", glm::vec3(0.5f));
-        ModelShader.setvec3("spotlight.specular", glm::vec3(0.2f));
+        ModelShader.setvec3("spotlight.ambient", glm::vec3(0.05f));
+        ModelShader.setvec3("spotlight.diffuse", glm::vec3(1.0f));
+        ModelShader.setvec3("spotlight.specular", glm::vec3(0.9f));
         ModelShader.setFloat("spotlight.constant", 1.0f);
         ModelShader.setFloat("spotlight.linear", 0.09f);
         ModelShader.setFloat("spotlight.quadratic", 0.032f);
-        //ModelShader.setBool("spotlight.enabled", SpotLightOn);
-
 
         ModelShader.setvec3("spotlight.position", camera.Position);
         ModelShader.setvec3("spotlight.direction", camera.Front);
         ModelShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
-        ModelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(30.5f)));
+        ModelShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(14.5f)));
 
         for (int i = 0; i < 4; ++i) {
         std::string number = std::to_string(i);
         ModelShader.setvec3("pointLights[" + number + "].position", pointLightPositions[i]);
-        ModelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f) * 0.05f);
-        ModelShader.setvec3("pointLights[" + number + "].diffuse", glm::vec3(0.8f));
-        ModelShader.setvec3("pointLights[" + number + "].specular", glm::vec3(1.0f));
+        ModelShader.setvec3("pointLights[" + number + "].ambient", glm::vec3(1.0f) * 0.004f);
+        ModelShader.setvec3("pointLights[" + number + "].diffuse", glm::vec3(0.0002f));
+        ModelShader.setvec3("pointLights[" + number + "].specular", glm::vec3(0.005f));
         ModelShader.setFloat("pointLights[" + number + "].constant", 1.0f);
         ModelShader.setFloat("pointLights[" + number + "].linear", 0.09f);
         ModelShader.setFloat("pointLights[" + number + "].quadratic", 0.032f);
@@ -343,37 +344,43 @@ int main(){
 
         ModelShader.setMat4("u_Model",ModelMatrix);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        ModelShader.setInt("u_DiffuseTexture", 0);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, 1);
-        ModelShader.setInt("u_SpecularTexture", 1);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, 2);
-        ModelShader.setInt("u_MetallicTexture", 2);
-        Chair.Translate(ModelShader,ModelMatrix,glm::vec3(0.0,0.0,0.0));
-        //Chair.RotateX(ModelShader,ModelMatrix,)
-        float angleY =glm::radians(270.0f); 
-        Chair.RotateY(ModelShader,ModelMatrix,angleY);                
-        float c_ScaleFactor = 0.2f;
-        Chair.Scale(ModelShader,ModelMatrix,c_ScaleFactor);
-        Chair.Draw(ModelShader);
-        ModelMatrix = glm::mat4(1.0f);
-        Table.Translate(ModelShader,ModelMatrix,glm::vec3(0.0,0.0,1.0));
-        float t_ScaleFactor = 0.003f;
-        Table.Scale(ModelShader,ModelMatrix,t_ScaleFactor);
-        float t_angleY =glm::radians(90.0f); 
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, 0);
+        //ModelShader.setInt("u_DiffuseTexture", 0);
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, 1);
+        //ModelShader.setInt("u_SpecularTexture", 1);
+        //glActiveTexture(GL_TEXTURE2);
+        //glBindTexture(GL_TEXTURE_2D, 2);
+        //ModelShader.setInt("u_MetallicTexture", 2);
 
-        Table.RotateY(ModelShader,ModelMatrix,t_angleY);
+        //Chair.Translate(ModelShader,ModelMatrix,glm::vec3(0.0,0.0,0.0));
+
+        Chair.RotateY(ModelShader,ModelMatrix,glm::radians(270.0f));                
+        Chair.Scale(ModelShader,ModelMatrix,0.1f);
+        Chair.Draw(ModelShader);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        Table.Translate(ModelShader,model,glm::vec3(0.0,-0.001,-0.613));
+        Table.RotateY(ModelShader,model,glm::radians(270.0f));
+        Table.Scale(ModelShader,model,0.1f);
+
         Table.Draw(ModelShader);
+
+        //std::cout<<1/deltaTime<<std::endl;
+
+
+
+
+
 
 
 
         //---------------------------------------FRAME CAPPING---------------------------------------------------------
         auto endTime = hr_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
-        double frameTime = elapsed.count(); 
+        double frameTime = elapsed.count();        
+        //std::cout << 1/frameTime << std::endl;
         if (frameTime < targetFrameDuration) {
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameDuration - frameTime));
         }

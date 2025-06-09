@@ -41,22 +41,22 @@ public:
             shader.setMat4("u_Model",Model);
         
     }
-    void RotateX(Shader& shader, glm::mat4& model, float &angle) {
+    void RotateX(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
         shader.setMat4("u_Model", model);
 
     }
 
-    void RotateY(Shader& shader, glm::mat4& model, float &angle) {
+    void RotateY(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
         shader.setMat4("u_Model", model);
     }  
 
-    void RotateZ(Shader& shader, glm::mat4& model, float &angle) {
+    void RotateZ(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
         shader.setMat4("u_Model", model);
     }
-    void Scale(Shader& shader,glm::mat4 model,float &ScaleFactor){
+    void Scale(Shader& shader,glm::mat4 model,float ScaleFactor){
         model = glm::scale(model,glm::vec3(ScaleFactor));
         shader.setMat4("u_Model",model);
     }
@@ -78,7 +78,7 @@ private:
 
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
-        std::cout << "MODEL LOADED: "<< path <<std::endl;
+        std::cout <<  path <<std::endl;
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
@@ -153,77 +153,96 @@ private:
             if (mesh->mMaterialIndex >= scene->mNumMaterials || !scene->mMaterials[mesh->mMaterialIndex]) {
                 std::cerr << "Invalid material index: " << mesh->mMaterialIndex << std::endl;
                 return Mesh(vertices, indices, textures); // return with no textures
-}
+            }
+            }
+            // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+            for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+            {
+                aiFace face = mesh->mFaces[i];
+                // retrieve all indices of the face and store them in the indices vector
+                for(unsigned int j = 0; j < face.mNumIndices; j++)
+                    indices.push_back(face.mIndices[j]);        
+            }
+            // process materials
+            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
+
+
+            // 1. diffuse  maps
+            
+            // 1. Base Color / Diffuse
+            std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_diffuse");
+            if (diffuseMaps.empty()) {
+                // fallback for older formats (like OBJ/FBX)
+                diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+            }
+            textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+            
+            // 2. Specular (legacy) — not used in PBR, but supported
+            std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+            textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+            
+            // 3. Normal Map
+            std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMAL_CAMERA, "texture_normal");
+            //if (normalMaps.empty()) {
+            //    // fallback (legacy)
+            //    normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+            //}
+            textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+            
+            // 4. Metallic Map (PBR)
+            std::vector<Texture> metallicMaps = loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metallic");
+            textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
+            
+            // 5. Roughness Map (PBR)
+            std::vector<Texture> roughnessMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness");
+            textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
+            
+            // 6. Ambient Occlusion
+            std::vector<Texture> aoMaps = loadMaterialTextures(material, aiTextureType_LIGHTMAP, "texture_ao");
+            textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
+            
+            // 7. Emissive Map
+            std::vector<Texture> emissiveMaps = loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emissive");
+            textures.insert(textures.end(), emissiveMaps.begin(), emissiveMaps.end());
+
+            // return a mesh object created from the extracted mesh data
+            return Mesh(vertices, indices, textures);
         }
-        // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-        for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+
+        // checks all material textures of a given type and loads the textures if they're not loaded yet.
+        // the required info is returned as a Texture struct.
+        vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) 
         {
-            aiFace face = mesh->mFaces[i];
-            // retrieve all indices of the face and store them in the indices vector
-            for(unsigned int j = 0; j < face.mNumIndices; j++)
-                indices.push_back(face.mIndices[j]);        
-        }
-        // process materials
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
-
-        // 1. diffuse  maps
+            vector<Texture> textures;
         
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        // 2. specular maps
-        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        // 3. normal maps
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        // 4. height maps
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-        
-        // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
-    }
-
-    // checks all material textures of a given type and loads the textures if they're not loaded yet.
-    // the required info is returned as a Texture struct.
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) 
-    {
-        vector<Texture> textures;
-    
-        for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
-            aiString str;
-            mat->GetTexture(type, i, &str);
-    
-            // Check if texture was loaded before to avoid duplication
-            bool skip = false;
-            for (unsigned int j = 0; j < textures_loaded.size(); j++) {
-                if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-                    textures.push_back(textures_loaded[j]);
-                    skip = true;
-                    break;
+            for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
+                aiString str;
+                mat->GetTexture(type, i, &str);
+            
+                // Check if texture was loaded before to avoid duplication
+                bool skip = false;
+                for (unsigned int j = 0; j < textures_loaded.size(); j++) {
+                    if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
+                        textures.push_back(textures_loaded[j]);
+                        skip = true;
+                        break;
+                    }
+                }
+            
+                if (!skip) {
+                    Texture texture;
+                    string fullPath = directory + '/' + string(str.C_Str());
+                    texture.id = TextureFromFile(fullPath.c_str(),directory);
+                    texture.type = typeName;
+                    texture.path = str.C_Str();
+                    textures.push_back(texture);
+                    textures_loaded.push_back(texture); // store it to avoid reloading
                 }
             }
-    
-            if (!skip) {
-                Texture texture;
-                string fullPath = directory + '/' + string(str.C_Str());
-                texture.id = TextureFromFile(fullPath.c_str(),directory);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture); // store it to avoid reloading
-            }
+            return textures;
         }
-        return textures;
-    }
-    
-    
-};
+        
+        
+};  
 
 #endif

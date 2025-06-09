@@ -57,29 +57,49 @@ public:
     void Draw(Shader &shader) 
     {
         shader.use();  
+
         unsigned int diffuseNr = 1;
         unsigned int specularNr = 1;
-        for(unsigned int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
+        unsigned int normalNr = 1;
+        unsigned int metallicNr = 1;
+        unsigned int roughnessNr = 1;
+        unsigned int aoNr = 1;
+        unsigned int emissiveNr = 1;
+
+        for (unsigned int i = 0; i < textures.size(); i++) {
+            glActiveTexture(GL_TEXTURE0 + i); // Activate the texture unit
+        
             string number;
             string name = textures[i].type;
-            if(name == "texture_diffuse")
+        
+            if (name == "texture_diffuse")
                 number = std::to_string(diffuseNr++);
-            else if(name == "texture_specular")
+            else if (name == "texture_specular")
                 number = std::to_string(specularNr++);
-    
-            shader.setInt(("material." + name + number).c_str(), i);
+            else if (name == "texture_normal")
+                number = std::to_string(normalNr++);
+            else if (name == "texture_metallic")
+                number = std::to_string(metallicNr++);
+            else if (name == "texture_roughness")
+                number = std::to_string(roughnessNr++);
+            else if (name == "texture_ao")
+                number = std::to_string(aoNr++);
+            else if (name == "texture_emissive")
+                number = std::to_string(emissiveNr++);
+        
+            // Set the sampler uniform in the shader
+            shader.setInt(( name + number).c_str(), i);
+        
+            // Bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
-        glActiveTexture(GL_TEXTURE0);
-    
-        // draw mesh
+
+        glActiveTexture(GL_TEXTURE0); 
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        //std::cout<<"MESH DRAWN"<<'\n';
-        glBindVertexArray(0);
+        glBindVertexArray(0); 
+
     }  
 
 private:

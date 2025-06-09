@@ -40,9 +40,14 @@ struct Spotlight {
     bool enabled;
 };
 
-uniform sampler2D u_DiffuseTexture;
-uniform sampler2D u_SpecularTexture;
-uniform sampler2D u_MetallicTexture;
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_normal1;
+uniform sampler2D texture_metallic1;
+uniform sampler2D texture_roughness1;
+uniform sampler2D texture_ao1;
+uniform sampler2D texture_emissive1;
+
 uniform vec3 u_ViewPos;
 uniform float u_SpecularStrength;
 
@@ -57,8 +62,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    vec3 texDiffuse = vec3(texture(u_DiffuseTexture, TexCoords));
-    vec3 texSpecular = vec3(texture(u_SpecularTexture, TexCoords));
+    vec3 texDiffuse = vec3(texture(texture_diffuse1, TexCoords));
+    vec3 texSpecular = vec3(texture(texture_specular1, TexCoords));
 
     vec3 ambient = light.ambient * texDiffuse;
     vec3 diffuse = light.diffuse * diff * texDiffuse;
@@ -78,8 +83,8 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance +
                                light.quadratic * (distance * distance));
 
-    vec3 texDiffuse = vec3(texture(u_DiffuseTexture, TexCoords));
-    vec3 texSpecular = vec3(texture(u_SpecularTexture, TexCoords));
+    vec3 texDiffuse = vec3(texture(texture_diffuse1, TexCoords));
+    vec3 texSpecular = vec3(texture(texture_specular1, TexCoords));
 
     vec3 ambient = light.ambient * texDiffuse;
     vec3 diffuse = light.diffuse * diff * texDiffuse;
@@ -107,8 +112,8 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float attenuation = 1.0 / (light.constant + light.linear * distance +
                                light.quadratic * (distance * distance));
 
-    vec3 texDiffuse = vec3(texture(u_DiffuseTexture, TexCoords));
-    vec3 texSpecular = vec3(texture(u_SpecularTexture, TexCoords));
+    vec3 texDiffuse = vec3(texture(texture_diffuse1, TexCoords));
+    vec3 texSpecular = vec3(texture(texture_specular1, TexCoords));
 
     vec3 ambient = light.ambient * texDiffuse;
     vec3 diffuse = light.diffuse * diff * texDiffuse * intensity;
@@ -120,7 +125,6 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     return ambient + diffuse + specular;
 }
-
 void main()
 {
     vec3 norm = normalize(Normal);
@@ -131,16 +135,22 @@ void main()
     for (int i = 0; i < NR_POINT_LIGHTS; ++i)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
 
-    if (spotlight.enabled)
+    if (true)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
     
-    //float metallic = texture(u_MetallicTexture, TexCoords).r;
-    //result = metallic *result;
+    float metallic = texture(texture_metallic1, TexCoords).r;
+    result = metallic *result;
     result = clamp(result, 0.0, 1.0); // avoid overflow or underflow
 
 
 
-    FragColor = vec4(result, 1.0);
+    //FragColor = vec4(result, 1.0);
+    //if (gl_FragCoord.x<800)
+    if (gl_FrontFacing)
+        FragColor = vec4(result, 1.0); //FragColor = vec4(0.5,0.0,0.0,1.0);
+    else
+        discard;//FragColor = vec4(0.0,0.5,0.0,0.0);
+    //gl_FragDepth = gl_FragCoord.z + 0.01;
 
     // Debug fallback:
     // FragColor = vec4(1.0, 0.0, 0.0, 1.0); // red

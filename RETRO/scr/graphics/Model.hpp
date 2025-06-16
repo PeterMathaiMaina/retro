@@ -106,6 +106,7 @@ private:
         vector<Vertex> vertices;
         vector<unsigned int> indices;
         vector<Texture> textures;
+       // vector<Mesh> meshes{processMesh(scene->mMeshes,scene}: 
 
         // walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)

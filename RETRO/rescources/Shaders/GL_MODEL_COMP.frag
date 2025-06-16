@@ -135,9 +135,8 @@ void main()
     for (int i = 0; i < NR_POINT_LIGHTS; ++i)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
 
-    if (true)
+    if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
-    
     float metallic = texture(texture_metallic1, TexCoords).r;
     result = metallic *result;
     result = clamp(result, 0.0, 1.0); // avoid overflow or underflow
@@ -146,12 +145,11 @@ void main()
 
     //FragColor = vec4(result, 1.0);
     //if (gl_FragCoord.x<800)
-    if (gl_FrontFacing)
-        FragColor = vec4(result, 1.0); //FragColor = vec4(0.5,0.0,0.0,1.0);
-    else
-        discard;//FragColor = vec4(0.0,0.5,0.0,0.0);
+    
+    FragColor = vec4(result, 1.0); //FragColor = vec4(0.5,0.0,0.0,1.0);
     //gl_FragDepth = gl_FragCoord.z + 0.01;
 
     // Debug fallback:
-    // FragColor = vec4(1.0, 0.0, 0.0, 1.0); // red
+    //FragColor = vec4(0.3, 0.0, 0.0, 1.0); // red
 }
+

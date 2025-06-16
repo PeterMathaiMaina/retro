@@ -72,8 +72,10 @@ public:
             string number;
             string name = textures[i].type;
         
-            if (name == "texture_diffuse")
+            if (name == "texture_diffuse"){
                 number = std::to_string(diffuseNr++);
+                std::cout << "SHIETTTT" << std::endl;
+            }
             else if (name == "texture_specular")
                 number = std::to_string(specularNr++);
             else if (name == "texture_normal")

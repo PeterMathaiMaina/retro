@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "../../third_party/glm/glm.hpp"
 #include "../glm/gtc/matrix_transform.hpp"
 #include <iostream>
@@ -54,17 +55,15 @@ public:
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
-        float velocity =2.8f * deltaTime;
+        float velocity =10.7f * deltaTime ;
+        //float acceleration = velocity/deltaTime;
+        //velocity = velocity* acceleration; 
         if (direction == FORWARD)    
             Position += Front * velocity;
-
-        
         if (direction == BACKWARD)
             Position -= Front * velocity;
-
         if (direction == LEFT)
             Position -= Right * velocity;
-
         if (direction == RIGHT)
             Position += Right * velocity;
     }

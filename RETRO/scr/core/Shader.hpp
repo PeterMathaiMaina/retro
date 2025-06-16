@@ -16,7 +16,7 @@ struct Shader
     unsigned int ID; // Shader program ID
 
     // Constructor generates the shader on the fly
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath);
     
     // Activate the shader program
     void use();

@@ -18,8 +18,8 @@ add_executable(RETRO2025
     scr/graphics/Mesh.hpp
     scr/graphics/Model.hpp
     scr/core/CleanUp.hpp   
+    scr/Headers/callbacks.cpp
     textureLoader/textureLoader.cpp
-
 )
 
 # Link the required libraries
@@ -43,6 +43,7 @@ target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/third_party/glm
     ${CMAKE_SOURCE_DIR}/third_party/imageprocessing
     ${CMAKE_SOURCE_DIR}/third_party/imageprocessing/gli
+    ${CMAKE_SOURCE_DIR}/scr/Headers
 )
 
 

@@ -9,7 +9,7 @@
 #include "../../third_party/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
-void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn) {
+void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn,Shader& shader) {
     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
@@ -23,10 +23,19 @@ void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,boo
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !flashlightTogglePressed) {
         flashlightTogglePressed = true;
-        flashlightOn = !flashlightOn;  // <--- THIS is the important part
+        flashlightOn = !flashlightOn;  
         std::cout << "Flashlight : " << (flashlightOn ? "ON" : "OFF") << std::endl;
     }
-
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+    {
+        shader.setBool("SpecularEnabled",true); 
+        // std::cout << "fuck me" <<std::endl;
+    }
+    else 
+    {
+        shader.setBool("SpecularEnabled",false);
+        // std::cout << "fuck me" <<std::endl;
+    }
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
         //std::cout << "FUCKED TWIT!!!!"<<std::endl;
         //std::cout << "FUCKED TWIT!!!!"<<std::endl;

@@ -105,9 +105,12 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.position - fragPos);
+    // vec3 viewDir = normalize(viewDir - fragPos );
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     // attenuation
     float distance = length(light.position - fragPos);
@@ -136,7 +139,7 @@ void main()
     vec3 viewDir = normalize(u_ViewPos - FragPos);
     vec3 result = CalcPointLight(pointLights[0], norm, FragPos, viewDir);
 
-    // result += Calcdirlight(dirlight, norm, viewDir);
+    // vec3 result = Calcdirlight(dirlight, norm, viewDir);
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
 

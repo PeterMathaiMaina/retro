@@ -219,7 +219,7 @@ int main(){
     Input input;
     Shader CubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.frag",nullptr);
     Shader LightCubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.frag",nullptr);
-    GLint SpecularMap = TextureFromFile("Tiles012_4K-JPG_Roughness.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLint SpecularMap = TextureFromFile("Specular.jpe","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     
     glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 1000.0f);
@@ -233,9 +233,9 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         CubeShader.use();
         CubeShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-        CubeShader.setvec3("dirlight.ambient", glm::vec3(0.1));
-        CubeShader.setvec3("dirlight.diffuse", glm::vec3(0.8f));
-        CubeShader.setvec3("dirlight.specular", glm::vec3(0.001f));
+        CubeShader.setvec3("dirlight.ambient", glm::vec3(0.05));
+        CubeShader.setvec3("dirlight.diffuse", glm::vec3(0.09f));
+        CubeShader.setvec3("dirlight.specular", glm::vec3(0.0001f));
         CubeShader.setvec3("spotlight.ambient", glm::vec3(0.1f));
         CubeShader.setvec3("spotlight.diffuse", glm::vec3(0.6f));
         CubeShader.setvec3("spotlight.specular", glm::vec3(1.0f));
@@ -255,8 +255,8 @@ int main(){
         CubeShader.setvec3("pointLights[0].diffuse", glm::vec3(1.8f));
         CubeShader.setvec3("pointLights[0].specular", glm::vec3(1.5f));
         CubeShader.setFloat("pointLights[0].constant", 1.0f);
-        CubeShader.setFloat("pointLights[0].linear", 0.09f);
-        CubeShader.setFloat("pointLights[0].quadratic", 0.032f); 
+        CubeShader.setFloat("pointLights[0].linear",  0.022f);
+        CubeShader.setFloat("pointLights[0].quadratic", 0.0019f); 
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,DiffuseMap);

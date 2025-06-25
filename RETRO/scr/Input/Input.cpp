@@ -26,16 +26,7 @@ void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,boo
         flashlightOn = !flashlightOn;  
         std::cout << "Flashlight : " << (flashlightOn ? "ON" : "OFF") << std::endl;
     }
-    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-    {
-        shader.setBool("SpecularEnabled",true); 
-        // std::cout << "fuck me" <<std::endl;
-    }
-    else 
-    {
-        shader.setBool("SpecularEnabled",false);
-        // std::cout << "fuck me" <<std::endl;
-    }
+
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
         //std::cout << "FUCKED TWIT!!!!"<<std::endl;
         //std::cout << "FUCKED TWIT!!!!"<<std::endl;

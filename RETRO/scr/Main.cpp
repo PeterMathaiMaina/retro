@@ -29,7 +29,6 @@ auto lastFrameTime = hr_clock::now();
 const double targetFPS = 90.0;
 const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
 Camera camera(glm::vec3(0.0f,0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
-void SetupShader(Shader &shader,glm::mat4 &ProjectionMatrix,Camera& camera);
 
 namespace FlashLight
 {
@@ -138,7 +137,7 @@ int main(){
     };
 
 
-    unsigned int amount = 200;
+    unsigned int amount = 150;
     glm::mat4* modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime())); // Seed random generator
 
@@ -147,7 +146,7 @@ int main(){
 
         // Random position in world space (adjust range as needed)
         float x = (rand() %  200 - 100); // Range: -100 to +100
-        float y = (rand() % 40 - 20);   // Range: -20 to +20
+        float y = (rand() % 70 - 0);   // Range: -20 to +20
         float z = (rand() % 200 - 100); // Range: -100 to +100
         model = glm::translate(model, glm::vec3(x, y, z));
 
@@ -156,7 +155,7 @@ int main(){
         model = glm::rotate(model, glm::radians(angle), glm::vec3(0.4f, 0.6f, 0.8f));
 
         // Optional: Random scale
-        float scale = static_cast<float>((rand() % 40) / 10.0f + 0.8f);
+        float scale = static_cast<float>((rand() % 40) / 10.0f + 2.8f);
         model = glm::scale(model, glm::vec3(scale));
 
         modelMatrices[i] = model;
@@ -199,6 +198,19 @@ int main(){
     glBindVertexArray(0);
 
 
+    unsigned int LightCubeVAO,LightCubeVBO;
+    glGenVertexArrays(1,&LightCubeVAO);
+    glGenBuffers(1,&LightCubeVBO);
+    glBindVertexArray(LightCubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER,LightCubeVBO);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(cubeVertices),&cubeVertices,GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8*sizeof(float),nullptr);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(5* sizeof(float)));
+    glBindVertexArray(0);
     Camera* cameraPtr = &camera;
     setupcallbacks(window,cameraPtr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -206,8 +218,9 @@ int main(){
 
     Input input;
     Shader CubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.frag",nullptr);
-    GLint SpecularMap = TextureFromFile("Fabric027_4K-JPG_Roughness.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLint DiffuseMap = TextureFromFile("Fabric027_4K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    Shader LightCubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.frag",nullptr);
+    GLint SpecularMap = TextureFromFile("Tiles012_4K-JPG_Roughness.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
     
     glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 1000.0f);
     while (!glfwWindowShouldClose(window)) {
@@ -216,10 +229,34 @@ int main(){
         float deltaTime = currentFrame - lastFrame;
         input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_MULTISAMPLE);
+        //glEnable(GL_MULTISAMPLE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         CubeShader.use();
-        SetupShader(CubeShader,projectionMatrix,camera);
+        CubeShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        CubeShader.setvec3("dirlight.ambient", glm::vec3(0.1));
+        CubeShader.setvec3("dirlight.diffuse", glm::vec3(0.8f));
+        CubeShader.setvec3("dirlight.specular", glm::vec3(0.001f));
+        CubeShader.setvec3("spotlight.ambient", glm::vec3(0.1f));
+        CubeShader.setvec3("spotlight.diffuse", glm::vec3(0.6f));
+        CubeShader.setvec3("spotlight.specular", glm::vec3(1.0f));
+        CubeShader.setFloat("spotlight.constant", 1.0f);
+        CubeShader.setFloat("spotlight.linear", 0.09f);
+        CubeShader.setFloat("spotlight.quadratic", 0.032f);
+        CubeShader.setvec3("spotlight.position", camera.Position);
+        CubeShader.setvec3("spotlight.direction", camera.Front);
+        CubeShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(10.5f)));
+        CubeShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(20.5f)));
+        CubeShader.setBool("spotlight.enabled", FlashLight::flashlightOn);
+        CubeShader.setMat4("u_View", camera.GetViewMatrix());
+        CubeShader.setvec3("u_ViewPos",camera.Position);
+        CubeShader.setMat4("u_Projection", projectionMatrix); 
+        CubeShader.setvec3("pointLights[0].position", lightPositions[0]);
+        CubeShader.setvec3("pointLights[0].ambient", glm::vec3(1.5f));
+        CubeShader.setvec3("pointLights[0].diffuse", glm::vec3(1.8f));
+        CubeShader.setvec3("pointLights[0].specular", glm::vec3(1.5f));
+        CubeShader.setFloat("pointLights[0].constant", 1.0f);
+        CubeShader.setFloat("pointLights[0].linear", 0.09f);
+        CubeShader.setFloat("pointLights[0].quadratic", 0.032f); 
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,DiffuseMap);
@@ -228,11 +265,26 @@ int main(){
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D,SpecularMap);
         CubeShader.setInt("texture_specular1",1);
-
+        bool SpecularEnabled = true;
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+           CubeShader.setBool("SpecularEnabled",SpecularEnabled);
+        else 
+            CubeShader.setBool("SpecularEnabled",false);
         glBindVertexArray(CUBEVAO);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount); 
-        //std::cout << "DRAWING THIS SHIET" << std::endl;
+        glBindVertexArray(0);
+        glBindVertexArray(LightCubeVAO);
+        LightCubeShader.use();
+        glm::mat4 LightCubeMat = glm::mat4(1.0f);
+        LightCubeMat = glm::translate(LightCubeMat,lightPositions[0]);
+        LightCubeShader.setMat4("u_Model",LightCubeMat);
+        LightCubeShader.setMat4("u_View",camera.GetViewMatrix());
+        LightCubeShader.setMat4("u_Projection",projectionMatrix);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        glBindVertexArray(0);
 
+        //std::cout << "DRAWING THIS SHIET" << std::endl;
+        // std::cout << "x: "<<cameraPtr->Position.x<< "y: "<<cameraPtr->Position.y<< "z: "<<cameraPtr->Position.z <<std::endl;
         auto endTime = hr_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
         double frameTime = elapsed.count();        
@@ -249,28 +301,4 @@ int main(){
     return 0;
 }
 
-void SetupShader(Shader &shader,glm::mat4 &ProjectionMatrix,Camera& camera){
-    shader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-    shader.setvec3("dirlight.ambient", glm::vec3(0.4f, 0.4f, 0.4f));
-    shader.setvec3("dirlight.diffuse", glm::vec3(0.4f));
-    shader.setvec3("dirlight.specular", glm::vec3(0.5f));
 
-
-    shader.setvec3("spotlight.ambient", glm::vec3(0.10f));
-    shader.setvec3("spotlight.diffuse", glm::vec3(0.9f));
-    shader.setvec3("spotlight.specular", glm::vec3(1.0f));
-    shader.setFloat("spotlight.constant", 1.0f);
-    shader.setFloat("spotlight.linear", 0.09f);
-    shader.setFloat("spotlight.quadratic", 0.32f);
-    shader.setvec3("spotlight.position", camera.Position);
-    shader.setvec3("spotlight.direction", camera.Front);
-    shader.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
-    shader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(30.5f)));
-    shader.setBool("spotlight.enabled", FlashLight::flashlightOn);
-
-    shader.setMat4("u_View", camera.GetViewMatrix());
-    shader.setvec3("u_ViewPos",camera.Position);
-    shader.setMat4("u_Projection", ProjectionMatrix);  
-    shader.setFloat("u_SpecularStrength",0.8);
-
-};

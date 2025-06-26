@@ -137,7 +137,7 @@ int main(){
     };
 
 
-    unsigned int amount = 150;
+    unsigned int amount = 70;
     glm::mat4* modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime())); // Seed random generator
 
@@ -145,8 +145,8 @@ int main(){
         glm::mat4 model = glm::mat4(1.0f);
 
         // Random position in world space (adjust range as needed)
-        float x = (rand() %  200 - 100); // Range: -100 to +100
-        float y = (rand() % 70 - 0);   // Range: -20 to +20
+        float x = (rand() %  100 - 100); // Range: -100 to +100
+        float y = (rand() % 70 - 10);   // Range: -20 to +20
         float z = (rand() % 200 - 100); // Range: -100 to +100
         model = glm::translate(model, glm::vec3(x, y, z));
 
@@ -219,16 +219,51 @@ int main(){
     Input input;
     Shader CubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.frag",nullptr);
     Shader LightCubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.frag",nullptr);
+    Shader DepthShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_SHADOW.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_SHADOW.frag",nullptr);
     GLint SpecularMap = TextureFromFile("Specular.jpe","/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    GLint DiffuseMap = TextureFromFile("WoodFloor041_1K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+
+    unsigned int DepthMapFBO;
+    glGenFramebuffers(1,&DepthMapFBO);
+
+    const unsigned int SHADOW_WIDTH = 1024,SHADOW_HEIGHT = 1024;
+    unsigned int ShadowMap;
+    glGenTextures(1,&ShadowMap);
+    glBindTexture(GL_TEXTURE_2D,ShadowMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
+    glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ShadowMap, 0);    
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE); 
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
     
+
+
     glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 1000.0f);
+    glm::mat4 LightProjection , LightView;
+    glm::mat4 LightSpaceMatrix;
+    LightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.001f, 1000.0f);
+    LightView = glm::lookAt(lightPositions[0],glm::vec3(0.0f),glm::vec3(0.0f,1.0f,0.0f));
+    LightSpaceMatrix = LightProjection * LightView;
+    DepthShader.setMat4("lightSpaceMatrix",LightSpaceMatrix);
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
+        glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        DepthShader.use();
+        glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
+        glViewport(0,0,1000,650);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
+        // glEnable(GL_FRAMEBUFFER_SRGB);
         //glEnable(GL_MULTISAMPLE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         CubeShader.use();
@@ -251,12 +286,13 @@ int main(){
         CubeShader.setvec3("u_ViewPos",camera.Position);
         CubeShader.setMat4("u_Projection", projectionMatrix); 
         CubeShader.setvec3("pointLights[0].position", lightPositions[0]);
-        CubeShader.setvec3("pointLights[0].ambient", glm::vec3(1.5f));
-        CubeShader.setvec3("pointLights[0].diffuse", glm::vec3(1.8f));
-        CubeShader.setvec3("pointLights[0].specular", glm::vec3(1.5f));
+        CubeShader.setvec3("pointLights[0].ambient", glm::vec3(3.0f));
+        CubeShader.setvec3("pointLights[0].diffuse", glm::vec3(3.0, 3.0, 3.0));
+        CubeShader.setvec3("pointLights[0].specular", glm::vec3(4.0, 4.0, 4.0));
         CubeShader.setFloat("pointLights[0].constant", 1.0f);
-        CubeShader.setFloat("pointLights[0].linear",  0.022f);
-        CubeShader.setFloat("pointLights[0].quadratic", 0.0019f); 
+        CubeShader.setFloat("pointLights[0].linear",  0.09f);
+        CubeShader.setFloat("pointLights[0].quadratic", 0.007f); 
+        CubeShader.setMat4("lightSpaceMatrix", LightSpaceMatrix); 
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,DiffuseMap);
@@ -265,6 +301,14 @@ int main(){
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D,SpecularMap);
         CubeShader.setInt("texture_specular1",1);
+
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D,ShadowMap);
+        CubeShader.setInt("shadowMap",2);
+
+
+
         bool SpecularEnabled = true;
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
            CubeShader.setBool("SpecularEnabled",SpecularEnabled);

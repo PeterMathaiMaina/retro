@@ -10,10 +10,7 @@ layout (location = 3) in mat4 instanceModel;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
-out vec4 FragPosLightSpace;
 
-uniform mat4 u_View;
-uniform mat4 u_Projection;
 uniform mat4 lightSpaceMatrix;
 
 void main()
@@ -22,8 +19,8 @@ void main()
 
     // Proper normal transformation with normal matrix from model
     Normal = mat3(transpose(inverse(instanceModel))) * aNormal;
-    vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0); // 💡 Key
+
     TexCoords = aTexCoords;
 
-    gl_Position = u_Projection* u_View * vec4(FragPos, 1.0);
+    gl_Position = lightSpaceMatrix * vec4(FragPos, 1.0);
 }

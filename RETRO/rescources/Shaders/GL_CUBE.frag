@@ -4,6 +4,8 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoords;
+in vec4 FragPosLightSpace;
+
 
 
 struct DirLight {
@@ -44,6 +46,7 @@ struct Spotlight {
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
+uniform sampler2D shadowMap;
 uniform vec3 u_ViewPos;
 uniform float u_SpecularStrength;
 uniform bool SpecularEnabled;
@@ -132,6 +135,17 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     return (ambient + diffuse + specular);
 }
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+    float bias = 0.005;
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
+}
+
 
 void main()
 {
@@ -139,10 +153,14 @@ void main()
     vec3 viewDir = normalize(u_ViewPos - FragPos);
     vec3 result = CalcPointLight(pointLights[0], norm, FragPos, viewDir);
 
-    // vec3 result = Calcdirlight(dirlight, norm, viewDir);
+    result += Calcdirlight(dirlight, norm, viewDir);
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
 
     result = clamp(result, 0.0, 1.0);
+    float shadow = ShadowCalculation(FragPosLightSpace);
+    vec3 lighting = (1.0 - shadow) * result;
     FragColor = vec4(result, 1.0);  
+    // float gamma = 0.2;
+    // FragColor.rgb = pow(result.rgb, vec3(1.0/gamma));
 }

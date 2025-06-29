@@ -12,9 +12,12 @@
 unsigned int TextureFromFile(const char* path, const std::string& directory)
 {
     std::filesystem::path texPath(path);
-    std::string fullPath = texPath.is_absolute() ? texPath.string() : (std::filesystem::path(directory) / texPath).string();
+    std::string fullPath = texPath.is_absolute() 
+        ? texPath.generic_string() 
+        : (std::filesystem::path(directory) / texPath).generic_string();
 
-    std::cout <<  fullPath << std::endl;//"Loading texture from: " <<
+    std::cout << "Loading texture from: " << fullPath << std::endl;
+
 
     std::string ext = texPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -73,7 +76,7 @@ unsigned int LoadTextureWithSTB(const std::string& fullPath)
 GLuint LoadCompressedTexture(const std::string& path) {
     gli::texture texture = gli::load(path);
     if (texture.empty()) {
-        std::cerr << "Failed to load DDS texture: " << path << std::endl;
+        std::cerr << "Failed to load Compressed texture: " << path << std::endl;
         return 0;
     }
 

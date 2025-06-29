@@ -1,36 +1,37 @@
-cmake_minimum_required(VERSION 3.28.3)
-project(RETRO2025 )
+cmake_minimum_required(VERSION 3.15)
+project(RETRO2025)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
+# Set Assimp install folder here (make sure this is where assimpConfig.cmake is)
+#set(CMAKE_PREFIX_PATH "C:/Users/user/assimp/install" ${CMAKE_PREFIX_PATH})
+
+# GLFW via FetchContent
+include(FetchContent)
+FetchContent_Declare(
+  glfw
+  GIT_REPOSITORY https://github.com/glfw/glfw.git
+  GIT_TAG latest
+)
+FetchContent_MakeAvailable(glfw)
+
+add_definitions(-DGLEW_STATIC)
 
 # Find required packages
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(assimp REQUIRED)
 
-
-# Add executable and include stb_image.cpp
 add_executable(RETRO2025
     scr/Renderer/Renderer.cpp
-    scr/Main.cpp 
-    scr/core/Shader.cpp 
-    third_party/imageprocessing/stb_image.cpp  
+    scr/Main.cpp
+    scr/core/Shader.cpp
+    third_party/imageprocessing/stb_image.cpp
     scr/Input/Input.cpp
-    scr/Camera/Camera.hpp
-    scr/graphics/Mesh.hpp
-    scr/graphics/Model.hpp
-    scr/core/CleanUp.hpp   
     scr/Headers/callbacks.cpp
     textureLoader/textureLoader.cpp
 )
 
-# Link the required libraries
-target_link_libraries(RETRO2025
-    OpenGL::GL    
-    GLEW::GLEW    
-    glfw      
-    assimp    
-)
-
-# Include directories (stb_image and other headers)
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
     ${CMAKE_SOURCE_DIR}/scr/Renderer
@@ -44,12 +45,12 @@ target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/third_party/imageprocessing
     ${CMAKE_SOURCE_DIR}/third_party/imageprocessing/gli
     ${CMAKE_SOURCE_DIR}/scr/Headers
+    ${CMAKE_SOURCE_DIR}/Libs/glew-2.1.0/include
 )
 
-
-# Set C++ standard
-set_target_properties(RETRO2025 PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
+target_link_libraries(RETRO2025
+    ${CMAKE_SOURCE_DIR}/Libs/glew-2.1.0/lib/Release/x64/glew32s.lib
+    glfw
+    OpenGL::GL
+    assimp
 )
-

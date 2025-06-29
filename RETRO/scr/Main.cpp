@@ -72,7 +72,7 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    GLFWwindow* window = glfwCreateWindow(1000, 650, "RETRO", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1600, 1000, "RETRO", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -217,11 +217,11 @@ int main(){
     glfwWindowHint(GLFW_SAMPLES,4);
 
     Input input;
-    Shader CubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_CUBE.frag",nullptr);
-    Shader LightCubeShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.frag",nullptr);
-    Shader DepthShader("/home/mathai/retro/RETRO/rescources/Shaders/GL_SHADOW.vert","/home/mathai/retro/RETRO/rescources/Shaders/GL_SHADOW.frag",nullptr);
-    GLint SpecularMap = TextureFromFile("Specular.jpe","/home/mathai/retro/RETRO/rescources/textures/Compressed");
-    GLint DiffuseMap = TextureFromFile("WoodFloor041_1K-JPG_Color.dds","/home/mathai/retro/RETRO/rescources/textures/Compressed");
+    Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr);
+    Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
+    Shader DepthShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.frag", nullptr);
+    GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
+    GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
 
     unsigned int DepthMapFBO;
     glGenFramebuffers(1,&DepthMapFBO);
@@ -260,7 +260,7 @@ int main(){
         glClear(GL_DEPTH_BUFFER_BIT);
         DepthShader.use();
         glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
-        glViewport(0,0,1000,650);
+        glViewport(0,0,1600, 1000);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
         // glEnable(GL_FRAMEBUFFER_SRGB);

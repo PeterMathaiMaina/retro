@@ -3,24 +3,20 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoords;
 layout (location = 2) in vec3 aNormal;
-
-// mat4 = 4 vec4s in consecutive locations
 layout (location = 3) in mat4 instanceModel;
+
+uniform mat4 lightSpaceMatrix;
 
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
 
-uniform mat4 lightSpaceMatrix;
-
 void main()
 {
-    FragPos = vec3(instanceModel * vec4(aPos, 1.0));
-
-    // Proper normal transformation with normal matrix from model
-    Normal = mat3(transpose(inverse(instanceModel))) * aNormal;
-
+    vec4 worldPosition = instanceModel * vec4(aPos, 1.0);
+    FragPos = worldPosition.xyz;
+    Normal = mat3(transpose(inverse(mat3(instanceModel)))) * aNormal;
     TexCoords = aTexCoords;
 
-    gl_Position = lightSpaceMatrix * vec4(FragPos, 1.0);
+    gl_Position = lightSpaceMatrix * worldPosition;
 }

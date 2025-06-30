@@ -139,28 +139,46 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
-    float currentDepth = projCoords.z;
-    float bias = 0.005;
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+
+    if(projCoords.z > 1.0)
+        return 0.0;
+
+    float shadow = 0.0;
+    float bias = max(0.005 * (1.0 - dot(normalize(Normal), normalize(dirlight.direction))), 0.0005);
+    float samples = 4.0;
+    float offset = 1.0 / 1024.0; // assuming 1024x1024 shadow map size
+
+    for(float x = -1.5; x <= 1.5; x += 1.0)
+    {
+        for(float y = -1.5; y <= 1.5; y += 1.0)
+        {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * offset).r;
+            shadow += (projCoords.z - bias > pcfDepth) ? 1.0 : 0.0;
+        }
+    }
+    shadow /= (samples * samples);
+
     return shadow;
 }
-
 
 void main()
 {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(u_ViewPos - FragPos);
+    
     vec3 result = CalcPointLight(pointLights[0], norm, FragPos, viewDir);
-
     result += Calcdirlight(dirlight, norm, viewDir);
+
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
-
-    result = clamp(result, 0.0, 1.0);
+    
     float shadow = ShadowCalculation(FragPosLightSpace);
     vec3 lighting = (1.0 - shadow) * result;
-    FragColor = vec4(result, 1.0);  
-    // float gamma = 0.2;
-    // FragColor.rgb = pow(result.rgb, vec3(1.0/gamma));
+    lighting = clamp(lighting, 0.0, 1.0);
+
+    float gamma = 2.2;
+    FragColor = vec4(lighting, 1.0);
+    // float depthValue = texture(shadowMap, TexCoords).r;
+    // FragColor = vec4(vec3(depthValue), 1.0);
 }
+

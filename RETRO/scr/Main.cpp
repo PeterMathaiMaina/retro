@@ -22,7 +22,7 @@
 
 
 
-
+const unsigned int WINDOW_WIDTH = 1000,WINDOW_HEIGHT = 600;
 float lastFrame = 0.0f;
 using hr_clock = std::chrono::high_resolution_clock;
 auto lastFrameTime = hr_clock::now();
@@ -40,7 +40,7 @@ struct CameraData {
     glm::mat4 projection;
 };
 glm::vec3 lightPositions[] = {
-    glm::vec3( 0.7f,  0.2f,  2.0f),
+    glm::vec3(6.40188f, 58.6908f, -59.3057f),
     glm::vec3( 2.3f, -3.3f, -4.0f),
     glm::vec3(-4.0f,  2.0f, -12.0f),
     glm::vec3( 0.0f,  0.0f, -3.0f),
@@ -63,7 +63,7 @@ glm::vec3 lightPositions[] = {
 };
 
     
-
+void SetupLightingShader(Camera& camera);
 
 
 
@@ -72,7 +72,7 @@ int main(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    GLFWwindow* window = glfwCreateWindow(1600, 1000, "RETRO", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "RETRO", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -127,7 +127,6 @@ int main(){
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  0.0f, -1.0f,  0.0f,
         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f, -1.0f,  0.0f,
 
-        // top face
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f,  1.0f,  0.0f,
         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,  0.0f,  1.0f,  0.0f,
         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  0.0f,  1.0f,  0.0f,
@@ -137,7 +136,7 @@ int main(){
     };
 
 
-    unsigned int amount = 70;
+    unsigned int amount = 300;
     glm::mat4* modelMatrices = new glm::mat4[amount];
     srand(static_cast<unsigned int>(glfwGetTime())); // Seed random generator
 
@@ -145,7 +144,7 @@ int main(){
         glm::mat4 model = glm::mat4(1.0f);
 
         // Random position in world space (adjust range as needed)
-        float x = (rand() %  100 - 100); // Range: -100 to +100
+        float x = (rand() %  200 - 100); // Range: -100 to +100
         float y = (rand() % 70 - 10);   // Range: -20 to +20
         float z = (rand() % 200 - 100); // Range: -100 to +100
         model = glm::translate(model, glm::vec3(x, y, z));
@@ -225,7 +224,6 @@ int main(){
 
     unsigned int DepthMapFBO;
     glGenFramebuffers(1,&DepthMapFBO);
-
     const unsigned int SHADOW_WIDTH = 1024,SHADOW_HEIGHT = 1024;
     unsigned int ShadowMap;
     glGenTextures(1,&ShadowMap);
@@ -260,7 +258,7 @@ int main(){
         glClear(GL_DEPTH_BUFFER_BIT);
         DepthShader.use();
         glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
-        glViewport(0,0,1600, 1000);
+        glViewport(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
         // glEnable(GL_FRAMEBUFFER_SRGB);
@@ -326,7 +324,7 @@ int main(){
         LightCubeShader.setMat4("u_Projection",projectionMatrix);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
-
+        std::cout << "X: "<< cameraPtr->Position.x <<"Y: "<< cameraPtr->Position.y <<"Z: "<< cameraPtr->Position.z << '\n';
         //std::cout << "DRAWING THIS SHIET" << std::endl;
         // std::cout << "x: "<<cameraPtr->Position.x<< "y: "<<cameraPtr->Position.y<< "z: "<<cameraPtr->Position.z <<std::endl;
         auto endTime = hr_clock::now();
@@ -345,4 +343,7 @@ int main(){
     return 0;
 }
 
+void SetupLightingShader(Camera& camera)
+{
 
+}

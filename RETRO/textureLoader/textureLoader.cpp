@@ -16,7 +16,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
         ? texPath.generic_string() 
         : (std::filesystem::path(directory) / texPath).generic_string();
 
-    std::cout << "Loading texture from: " << fullPath << std::endl;
+    std::cout << fullPath << std::endl;
 
 
     std::string ext = texPath.extension().string();

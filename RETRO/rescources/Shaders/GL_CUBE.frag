@@ -158,27 +158,25 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     }
     shadow /= (samples * samples);
 
-    return shadow;
+    return 0.0;
 }
-
 void main()
 {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(u_ViewPos - FragPos);
-    
-    vec3 result = CalcPointLight(pointLights[0], norm, FragPos, viewDir);
-    result += Calcdirlight(dirlight, norm, viewDir);
 
+    vec3 dirLightResult = Calcdirlight(dirlight, norm, viewDir);
+    float shadow = ShadowCalculation(FragPosLightSpace);
+    dirLightResult *= (1.0 - shadow);
+
+    vec3 result = dirLightResult;
+
+    // for (int i = 0; i < NR_POINT_LIGHTS; i++)
+    //     result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
-    
-    float shadow = ShadowCalculation(FragPosLightSpace);
-    vec3 lighting = (1.0 - shadow) * result;
-    lighting = clamp(lighting, 0.0, 1.0);
+    // Optional gamma correction
+    // result = pow(result, vec3(1.0 / 2.2));
 
-    float gamma = 2.2;
-    FragColor = vec4(lighting, 1.0);
-    // float depthValue = texture(shadowMap, TexCoords).r;
-    // FragColor = vec4(vec3(depthValue), 1.0);
+    FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
 }
-

@@ -257,3 +257,63 @@
 	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
     glBindVertexArray(0);
+        glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        DepthShader.use();
+        glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
+        glViewport(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glEnable(GL_DEPTH_TEST);
+        // glEnable(GL_FRAMEBUFFER_SRGB);
+        //glEnable(GL_MULTISAMPLE);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        CubeShader.use();
+        setDirLight(CubeShader,glm::vec3(-0.2f, -1.0f, -0.3f),glm::vec3(1.0),glm::vec3(1.0),glm::vec3(1.0));
+        setSpotLight(CubeShader, "spotlight",camera.Position, camera.Front,glm::vec3(0.1f),glm::vec3(0.6f),glm::vec3(1.0f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(20.5f)),FlashLight::flashlightOn);
+        CubeShader.setMat4("lightSpaceMatrix", LightSpaceMatrix); 
+        CubeShader.setMat4("u_View", camera.GetViewMatrix());
+        CubeShader.setvec3("u_ViewPos",camera.Position);
+        CubeShader.setMat4("u_Projection", projectionMatrix); 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,DiffuseMap);
+        CubeShader.setInt("texture_diffuse1",0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D,SpecularMap);
+        CubeShader.setInt("texture_specular1",1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D,ShadowMap);
+        CubeShader.setInt("shadowMap",2);
+
+        glBindVertexArray(CUBEVAO);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount); 
+        glBindVertexArray(0);
+        glBindVertexArray(LightCubeVAO);
+        LightCubeShader.use();
+        glm::mat4 LightCubeMat = glm::mat4(1.0f);
+        LightCubeMat = glm::translate(LightCubeMat,lightPositions[0]);
+        LightCubeShader.setMat4("u_Model",LightCubeMat);
+        LightCubeShader.setMat4("u_View",camera.GetViewMatrix());
+        LightCubeShader.setMat4("u_Projection",projectionMatrix);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        glBindVertexArray(0);
+        // Oldhouse.Draw(ModelShader);
+
+        // std::cout << "X: "<< cameraPtr->Position.x <<"Y: "<< cameraPtr->Position.y <<"Z: "<< cameraPtr->Position.z << '\n';
+        //std::cout << "DRAWING THIS SHIET" << std::endl;
+        
+
+
+
+
+
+
+
+            glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 1000.0f);
+    glm::mat4 LightProjection , LightView;
+    glm::mat4 LightSpaceMatrix;
+    LightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.001f, 1000.0f);
+    LightView = glm::lookAt(lightPositions[0],glm::vec3(0.0f),glm::vec3(0.0f,1.0f,0.0f));
+    LightSpaceMatrix = LightProjection * LightView;
+    DepthShader.setMat4("lightSpaceMatrix",LightSpaceMatrix);

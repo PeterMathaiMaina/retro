@@ -23,18 +23,19 @@ find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
 
 add_executable(RETRO2025
-    scr/Renderer/Renderer.cpp
     scr/Main.cpp
     scr/core/Shader.cpp
     third_party/imageprocessing/stb_image.cpp
     scr/Input/Input.cpp
     scr/Headers/callbacks.cpp
     textureLoader/textureLoader.cpp
+    scr/Shader/ShaderSetup.cpp
+
 )
 
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
-    ${CMAKE_SOURCE_DIR}/scr/Renderer
+    ${CMAKE_SOURCE_DIR}/scr/Shader
     ${CMAKE_SOURCE_DIR}/scr/core
     ${CMAKE_SOURCE_DIR}/scr/graphics
     ${CMAKE_SOURCE_DIR}/scr/Input

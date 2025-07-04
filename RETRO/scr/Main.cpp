@@ -19,14 +19,14 @@
 #include "core/CleanUp.hpp"
 #include "Headers/Callbacks.h"
 #include <bitset>
+#include "Shader/ShaderSetup.h"
 
 
-
-const unsigned int WINDOW_WIDTH = 1000,WINDOW_HEIGHT = 600;
+const unsigned int WINDOW_WIDTH = 1600,WINDOW_HEIGHT = 1000;
 float lastFrame = 0.0f;
 using hr_clock = std::chrono::high_resolution_clock;
 auto lastFrameTime = hr_clock::now();
-const double targetFPS = 90.0;
+const double targetFPS = 60.0;
 const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
 Camera camera(glm::vec3(0.0f,0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 
@@ -40,7 +40,7 @@ struct CameraData {
     glm::mat4 projection;
 };
 glm::vec3 lightPositions[] = {
-    glm::vec3(6.40188f, 58.6908f, -59.3057f),
+    glm::vec3(20.40188f, 0.0f, -0.3057f),
     glm::vec3( 2.3f, -3.3f, -4.0f),
     glm::vec3(-4.0f,  2.0f, -12.0f),
     glm::vec3( 0.0f,  0.0f, -3.0f),
@@ -61,9 +61,27 @@ glm::vec3 lightPositions[] = {
     glm::vec3( 2.5f,  0.8f,  3.0f),
     glm::vec3(-3.5f,  1.2f, -1.0f)
 };
+glm::mat4 GetRotationAroundYPoint(glm::vec3 pivotPoint, float radius, float speed, float scale) {
+    float time = glfwGetTime();
+    float angle = time * speed;
 
-    
-void SetupLightingShader(Camera& camera);
+    glm::mat4 model = glm::mat4(1.0f);
+
+    // 1. Move to the pivot point
+    model = glm::translate(model, pivotPoint);
+
+    // 2. Rotate around the pivot's Y axis
+    model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // 3. Move away from the pivot (orbit radius along X or Z)
+    model = glm::translate(model, glm::vec3(radius, 0.0f, 0.0f));
+
+    // 4. Scale the object
+    model = glm::scale(model, glm::vec3(scale));
+
+    return model;
+}
+
 
 
 
@@ -71,6 +89,8 @@ int main(){
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_DEPTH_BITS, 24);  // Use 24 or 32 bits
+
 
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "RETRO", nullptr, nullptr);
     if (!window) {
@@ -210,6 +230,7 @@ int main(){
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(5* sizeof(float)));
     glBindVertexArray(0);
+
     Camera* cameraPtr = &camera;
     setupcallbacks(window,cameraPtr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -217,116 +238,94 @@ int main(){
 
     Input input;
     Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr);
+    Shader HouseShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.frag", nullptr);
     Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
     Shader DepthShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.frag", nullptr);
+    Model Oldhouse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Room\\Untitled.obj");
+    Model Sphere("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\sphere\\Untitled.obj");
     GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
     GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
 
     unsigned int DepthMapFBO;
     glGenFramebuffers(1,&DepthMapFBO);
-    const unsigned int SHADOW_WIDTH = 1024,SHADOW_HEIGHT = 1024;
+    const unsigned int SHADOW_WIDTH = 4096,SHADOW_HEIGHT = 4096;
     unsigned int ShadowMap;
+    glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
     glGenTextures(1,&ShadowMap);
     glBindTexture(GL_TEXTURE_2D,ShadowMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-    glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // white = not in shadow
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ShadowMap, 0);    
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE); 
     glBindFramebuffer(GL_FRAMEBUFFER,0);
     
-
-
     glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)955 / (float)560, 0.001f, 1000.0f);
     glm::mat4 LightProjection , LightView;
     glm::mat4 LightSpaceMatrix;
-    LightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.001f, 1000.0f);
-    LightView = glm::lookAt(lightPositions[0],glm::vec3(0.0f),glm::vec3(0.0f,1.0f,0.0f));
+    LightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 30.0f);
+    LightView = glm::lookAt( glm::vec3(0.0f, 10.0f, 0.0f),glm::vec3(0.0f),glm::vec3(0.0f,0.0f,-1.0f));
     LightSpaceMatrix = LightProjection * LightView;
-    DepthShader.setMat4("lightSpaceMatrix",LightSpaceMatrix);
+
+    // Pass to shader
+    DepthShader.use();
+    DepthShader.setMat4("lightSpaceMatrix", LightSpaceMatrix);
+
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
-        input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
-        glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        DepthShader.use();
-        glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
-        glViewport(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
-        // glEnable(GL_FRAMEBUFFER_SRGB);
-        //glEnable(GL_MULTISAMPLE);
+        glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
+        glBindFramebuffer(  GL_FRAMEBUFFER,DepthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+
+        input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
+
+        HouseShader.use();
+        glm::mat4 HouseModelMat = glm::mat4(1.0f);
+        HouseModelMat = glm::scale(HouseModelMat,glm::vec3(1.0f));
+        HouseShader.setMat4("model",HouseModelMat);
+        HouseShader.setMat4("projection",projectionMatrix);
+        HouseShader.setMat4("view",camera.GetViewMatrix());
+        HouseShader.setMat4("lightSpaceMatrix",LightSpaceMatrix);
+        setDirLight(HouseShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.1),glm::vec3(0.8),glm::vec3(1.003));
+        setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front,glm::vec3(0.1f),glm::vec3(0.6f),glm::vec3(1.0f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(12.5f)),FlashLight::flashlightOn);
+        glm::vec3 pivot = glm::vec3(-0.346708f, 1.86082f, -0.629334f); // World-space pivot point on the X-axis
+        glm::mat4 model = GetRotationAroundYPoint(pivot,1.0f, 1.0f, 0.5f);
+
+        DepthShader.use();
+        DepthShader.setMat4("model",HouseModelMat);
+        Oldhouse.Draw(DepthShader);
+        DepthShader.setMat4("model", model);
+        Sphere.Draw(DepthShader);
+
+        glCullFace(GL_BACK);  // Restore for normal rendering
+        glViewport(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        CubeShader.use();
-        CubeShader.setvec3("dirlight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-        CubeShader.setvec3("dirlight.ambient", glm::vec3(0.05));
-        CubeShader.setvec3("dirlight.diffuse", glm::vec3(0.09f));
-        CubeShader.setvec3("dirlight.specular", glm::vec3(0.0001f));
-        CubeShader.setvec3("spotlight.ambient", glm::vec3(0.1f));
-        CubeShader.setvec3("spotlight.diffuse", glm::vec3(0.6f));
-        CubeShader.setvec3("spotlight.specular", glm::vec3(1.0f));
-        CubeShader.setFloat("spotlight.constant", 1.0f);
-        CubeShader.setFloat("spotlight.linear", 0.09f);
-        CubeShader.setFloat("spotlight.quadratic", 0.032f);
-        CubeShader.setvec3("spotlight.position", camera.Position);
-        CubeShader.setvec3("spotlight.direction", camera.Front);
-        CubeShader.setFloat("spotlight.cutOff", glm::cos(glm::radians(10.5f)));
-        CubeShader.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(20.5f)));
-        CubeShader.setBool("spotlight.enabled", FlashLight::flashlightOn);
-        CubeShader.setMat4("u_View", camera.GetViewMatrix());
-        CubeShader.setvec3("u_ViewPos",camera.Position);
-        CubeShader.setMat4("u_Projection", projectionMatrix); 
-        CubeShader.setvec3("pointLights[0].position", lightPositions[0]);
-        CubeShader.setvec3("pointLights[0].ambient", glm::vec3(3.0f));
-        CubeShader.setvec3("pointLights[0].diffuse", glm::vec3(3.0, 3.0, 3.0));
-        CubeShader.setvec3("pointLights[0].specular", glm::vec3(4.0, 4.0, 4.0));
-        CubeShader.setFloat("pointLights[0].constant", 1.0f);
-        CubeShader.setFloat("pointLights[0].linear",  0.09f);
-        CubeShader.setFloat("pointLights[0].quadratic", 0.007f); 
-        CubeShader.setMat4("lightSpaceMatrix", LightSpaceMatrix); 
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,DiffuseMap);
-        CubeShader.setInt("texture_diffuse1",0);
+        HouseShader.use();
+        glActiveTexture(GL_TEXTURE1); // Use texture unit 1 (0 is often used for diffuse)
+        glBindTexture(GL_TEXTURE_2D, ShadowMap); // Your generated shadow depth texture
+        HouseShader.setInt("shadowMap", 1); // GL_TEXTURE1
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D,SpecularMap);
-        CubeShader.setInt("texture_specular1",1);
+        HouseShader.setMat4("model",HouseModelMat);
+        Oldhouse.Draw(HouseShader);
+        HouseShader.setMat4("model", model);
+        Sphere.Draw(HouseShader);
 
 
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D,ShadowMap);
-        CubeShader.setInt("shadowMap",2);
-
-
-
-        bool SpecularEnabled = true;
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-           CubeShader.setBool("SpecularEnabled",SpecularEnabled);
-        else 
-            CubeShader.setBool("SpecularEnabled",false);
-        glBindVertexArray(CUBEVAO);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount); 
-        glBindVertexArray(0);
-        glBindVertexArray(LightCubeVAO);
-        LightCubeShader.use();
-        glm::mat4 LightCubeMat = glm::mat4(1.0f);
-        LightCubeMat = glm::translate(LightCubeMat,lightPositions[0]);
-        LightCubeShader.setMat4("u_Model",LightCubeMat);
-        LightCubeShader.setMat4("u_View",camera.GetViewMatrix());
-        LightCubeShader.setMat4("u_Projection",projectionMatrix);
-        glDrawArrays(GL_TRIANGLES,0,36);
-        glBindVertexArray(0);
-        std::cout << "X: "<< cameraPtr->Position.x <<"Y: "<< cameraPtr->Position.y <<"Z: "<< cameraPtr->Position.z << '\n';
-        //std::cout << "DRAWING THIS SHIET" << std::endl;
         // std::cout << "x: "<<cameraPtr->Position.x<< "y: "<<cameraPtr->Position.y<< "z: "<<cameraPtr->Position.z <<std::endl;
+
+
+
         auto endTime = hr_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
         double frameTime = elapsed.count();        
@@ -343,7 +342,3 @@ int main(){
     return 0;
 }
 
-void SetupLightingShader(Camera& camera)
-{
-
-}

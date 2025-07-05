@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include "core/Shader.hpp"
+#include "core/HeightMap.hpp"
 #include "../third_party/imageprocessing/stb_image.h"
 #include "../third_party/imageprocessing/gli/gli.hpp"
 #include "../third_party/glm/glm.hpp"
@@ -22,11 +23,12 @@
 #include "Shader/ShaderSetup.h"
 
 
+
 const unsigned int WINDOW_WIDTH = 1600,WINDOW_HEIGHT = 1000;
 float lastFrame = 0.0f;
 using hr_clock = std::chrono::high_resolution_clock;
 auto lastFrameTime = hr_clock::now();
-const double targetFPS = 60.0;
+const double targetFPS = 90.0;
 const double targetFrameDuration = 1.0 / targetFPS; // ~0.01667 seconds (16.67 ms)
 Camera camera(glm::vec3(0.0f,0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 
@@ -241,10 +243,13 @@ int main(){
     Shader HouseShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.frag", nullptr);
     Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
     Shader DepthShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.frag", nullptr);
+    Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
     Model Oldhouse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Room\\Untitled.obj");
     Model Sphere("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\sphere\\Untitled.obj");
     GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
     GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
+
+    HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed\\Specular.jpe" , 5.0);
 
     unsigned int DepthMapFBO;
     glGenFramebuffers(1,&DepthMapFBO);
@@ -275,6 +280,7 @@ int main(){
     // Pass to shader
     DepthShader.use();
     DepthShader.setMat4("lightSpaceMatrix", LightSpaceMatrix);
+    glEnable(GL_CULL_FACE);
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
@@ -298,8 +304,8 @@ int main(){
         setDirLight(HouseShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.1),glm::vec3(0.8),glm::vec3(1.003));
         setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front,glm::vec3(0.1f),glm::vec3(0.6f),glm::vec3(1.0f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(12.5f)),FlashLight::flashlightOn);
         glm::vec3 pivot = glm::vec3(-0.346708f, 1.86082f, -0.629334f); // World-space pivot point on the X-axis
-        glm::mat4 model = GetRotationAroundYPoint(pivot,1.0f, 1.0f, 0.5f);
-
+        glm::mat4 model = GetRotationAroundYPoint(pivot,1.0f, 3.5f, 0.5f);
+        glCullFace(GL_FRONT);
         DepthShader.use();
         DepthShader.setMat4("model",HouseModelMat);
         Oldhouse.Draw(DepthShader);
@@ -321,6 +327,20 @@ int main(){
         HouseShader.setMat4("model", model);
         Sphere.Draw(HouseShader);
 
+        // HeightMapShader.use();
+        // HeightMapShader.setMat4("model", glm::mat4(1.0f));
+        // HeightMapShader.setMat4("projection", projectionMatrix);
+        // HeightMapShader.setMat4("view", camera.GetViewMatrix()); // if needed
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // enable wireframe
+        shadowscene.Draw(HeightMapShader,glm::mat4(1.0f),camera.GetViewMatrix(),projectionMatrix);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // back to solid fill
+
+        
+        // std::cout << "VAO: " << shadowscene.GetHeightMapVAO() << std::endl;
+        // std::cout << "Indices count: " << shadowscene.GetIndices().size() << std::endl;
+
+
+        // shadowscene.Draw(HeightMapShader);
 
         // std::cout << "x: "<<cameraPtr->Position.x<< "y: "<<cameraPtr->Position.y<< "z: "<<cameraPtr->Position.z <<std::endl;
 

@@ -188,8 +188,8 @@ void main()
 
     // Gamma correction
     // result = pow(result, vec3(1.0 / 2.2));
-    // FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
     FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
+    // FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
     // FragColor = vec4(texture(shadowMap,TexCoords).r);
     // debug.frag
 

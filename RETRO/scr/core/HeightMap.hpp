@@ -31,32 +31,40 @@ struct HeightMap {
             return;
         }
 
-        std::cout << "✅ Heightmap loaded: " << path << " (" << width << "x" << height << ", channels: " << nrChannels << ")\n";
+        std::cout << "Heightmap loaded: " << path << " (" << width << "x" << height << ", channels: " << nrChannels << ")\n";
+        int step = 4;
 
-        // Generate vertices
-        for (int z = 0; z < height; ++z) {
-            for (int x = 0; x < width; ++x) {
+        for (int z = 0; z < height; z += step) {
+            for (int x = 0; x < width; x += step) {
                 float y = data[z * width + x] / 255.0f * maxHeight;
+
+                
                 vertices.push_back((float)x);
                 vertices.push_back(y);
                 vertices.push_back((float)z);
+
+                float u = (float)x / (width - 1);  
+                float v = (float)z / (height - 1);  
+                vertices.push_back(u);
+                vertices.push_back(v);
             }
         }
 
-        // Generate indices
-        for (int z = 0; z < height - 1; ++z) {
-            for (int x = 0; x < width - 1; ++x) {
-                int topLeft     = z * width + x;
+
+        int numCols = width / step;
+        int numRows = height / step;
+
+        for (int z = 0; z < numRows - 1; ++z) {
+            for (int x = 0; x < numCols - 1; ++x) {
+                int topLeft     = z * numCols + x;
                 int topRight    = topLeft + 1;
-                int bottomLeft  = (z + 1) * width + x;
+                int bottomLeft  = (z + 1) * numCols + x;
                 int bottomRight = bottomLeft + 1;
 
-                // First triangle
                 indices.push_back(topLeft);
                 indices.push_back(bottomLeft);
                 indices.push_back(topRight);
 
-                // Second triangle
                 indices.push_back(topRight);
                 indices.push_back(bottomLeft);
                 indices.push_back(bottomRight);
@@ -105,17 +113,19 @@ private:
 
         glBindVertexArray(VAO);
 
-        // Vertex buffer
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-        // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-        // Vertex attribute: position (location = 0)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+
 
         glBindVertexArray(0);
     }

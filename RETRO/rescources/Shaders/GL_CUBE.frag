@@ -130,9 +130,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    if(SpecularEnabled)
-        return  vec3(texture(texture_specular1, TexCoords).rgb);
-
     return (ambient + diffuse + specular);
 }
 float ShadowCalculation(vec4 fragPosLightSpace)

@@ -1,10 +1,10 @@
 #include "ShaderSetup.h"
 void setDirLight(Shader& shader, const glm::vec3& direction,
                  const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular) {
-    shader.setvec3("dirLight.direction", direction);
-    shader.setvec3("dirLight.ambient", ambient);
-    shader.setvec3("dirLight.diffuse", diffuse);
-    shader.setvec3("dirLight.specular", specular);
+    shader.setvec3("dirlight.direction", direction);
+    shader.setvec3("dirlight.ambient", ambient);
+    shader.setvec3("dirlight.diffuse", diffuse);
+    shader.setvec3("dirlight.specular", specular);
 }
 void setPointLight(Shader& shader, const std::string& name, const glm::vec3& position,
                    const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
@@ -34,3 +34,9 @@ void setSpotLight(Shader& shader, const std::string& name, const glm::vec3& posi
     shader.setFloat(name + ".outerCutOff", outerCutOff);
     shader.setBool(name + ".enabled", enabled);
 }
+void setMatrices(const Shader& shader,const  glm::mat4& model, const glm::mat4& Projection, const glm::mat4& view)
+{
+    shader.setMat4("model",model);
+    shader.setMat4("projection",Projection);
+    shader.setMat4("view",view);
+};

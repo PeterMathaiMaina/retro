@@ -1,0 +1,11 @@
+Model Information:
+* title:	Church Pew Bench
+* source:	https://sketchfab.com/3d-models/church-pew-bench-05b6508546f74c50ab611a21ee218cac
+* author:	Amatsukast (https://sketchfab.com/Amatsukast)
+
+Model License:
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Church Pew Bench" (https://sketchfab.com/3d-models/church-pew-bench-05b6508546f74c50ab611a21ee218cac) by Amatsukast (https://sketchfab.com/Amatsukast) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)

@@ -24,7 +24,7 @@
 
 
 
-const unsigned int WINDOW_WIDTH = 2000,WINDOW_HEIGHT = 1200;
+const unsigned int WINDOW_WIDTH = 1900,WINDOW_HEIGHT = 1080;
 const unsigned int SHADOW_WIDTH = 4096,SHADOW_HEIGHT = 4096;
 float shd_aspect  = (float)SHADOW_WIDTH/(float)SHADOW_HEIGHT;
 
@@ -248,13 +248,14 @@ int main(){
     Shader DepthShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.frag", nullptr);
     Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
     Shader Pointshadows("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBESHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBESHADOW.frag", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\Geometry\\GL_CUBESHADOW.geom");
-
-    Model Oldhouse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Room\\Untitled.obj");
+    Model Oldhouse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Room\\scene.gltf");//C:\Users\user\retro\RETRO\rescources\Model\they_are_here
+    Model Bench1("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Bench1\\Bench.fbx");//C:\Users\user\retro\RETRO\rescources\Model\they_are_here
+    Model Tree("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\tree\\scene.gltf");//C:\Users\user\retro\RETRO\rescources\Model\they_are_here
     Model Sphere("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\sphere\\Untitled.obj");
     GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
     GLint DiffuseMap = TextureFromFile("Tiles012_4K-JPG_Color.dds", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
     // GLint TerrainTexture = TextureFromFile("Grass005_4K-JPG_Displacement.dds","C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    // HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed\\Tiles012_4K-JPG_Roughness.jpg" , 10.0);
+    HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed\\Tiles012_4K-JPG_Roughness.jpg" , 10.0);
 
     unsigned int DepthMapFBO;
     glGenFramebuffers(1,&DepthMapFBO);
@@ -288,18 +289,9 @@ int main(){
     DepthShader.setMat4("lightSpaceMatrix", LightSpaceMatrix);
 
 
-    // Pointshadows.use();
-    // for (unsigned int i = 0; i < shadowTransforms.size(); ++i)
-    // {
-    //     Pointshadows.setMat4("shadowMatrices[" + std::to_string(i) + "]",shadowTransforms[i]);
-    // }
-    // Pointshadows.setvec3("lightPos",lightPositions[10]);
-    // Pointshadows.setFloat("far_plane",1000.0f);
 
 
 
-
-    glEnable(GL_CULL_FACE);
 
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
@@ -307,7 +299,6 @@ int main(){
         float deltaTime = currentFrame - lastFrame;
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
-        glEnable(GL_CULL_FACE);
 
         input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
 
@@ -317,38 +308,57 @@ int main(){
         HouseShader.setMat4("model",HouseModelMat);
         HouseShader.setMat4("projection",projectionMatrix);
         HouseShader.setMat4("view",camera.GetViewMatrix());
-        HouseShader.setMat4("lightSpaceMatrix",LightSpaceMatrix);
 
-        setDirLight(HouseShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.6),glm::vec3(0.8),glm::vec3(1.003));
-        setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front,glm::vec3(0.1f),glm::vec3(2.6f),glm::vec3(3.0f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(18.5f)),FlashLight::flashlightOn);
-        setPointLight(HouseShader, "pointLights[0]", lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(5.0f),1.0f, 0.09f, 0.032f);     
+        setDirLight(HouseShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.06),glm::vec3(0.8),glm::vec3(0.003));
+        setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front,glm::vec3(3.1f),glm::vec3(1.6f),glm::vec3(1.0f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(18.5f)),FlashLight::flashlightOn);
+        setPointLight(HouseShader, "pointLights[0]", lightPositions[10],glm::vec3(1.7f), glm::vec3(0.5f), glm::vec3(1.0f),1.0f, 0.09f, 0.032f);     
         glm::vec3 pivot = glm::vec3(-0.346708f, 1.86082f, -0.629334f); 
-        glm::mat4 model = GetRotationAroundYPoint(pivot,1.0f, 1.5f, 0.5f);
+        glm::mat4 SphereModel = GetRotationAroundYPoint(pivot,1.0f, 0.2f, 0.5f);
+        CubeShader.use();
+        CubeShader.setMat4("view",camera.GetViewMatrix());
+        CubeShader.setMat4("projection",projectionMatrix);
+        // SphereModel = glm::translate(SphereModel, glm::vec3(-5.0f,0.0f,0.0f));
+
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // enable wireframe
-
+        CubeShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, DiffuseMap);  // or Sphere-specific texture
+        CubeShader.setInt("texture_diffuse1", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, SpecularMap);
+        CubeShader.setInt("texture_specular1", 1);
 
 
         HouseShader.use();
-        glActiveTexture(GL_TEXTURE1); // Use texture unit 1 (0 is often used for diffuse)
-        glBindTexture(GL_TEXTURE_2D, ShadowMap); // Your generated shadow depth texture
-        HouseShader.setInt("shadowMap", 1); // GL_TEXTURE1
         HouseShader.setMat4("model",HouseModelMat);
-        Oldhouse.Draw(HouseShader);
-        HouseShader.setMat4("model", model);
-        Sphere.Draw(HouseShader);
+        Oldhouse.RotateX(HouseShader,HouseModelMat,glm::radians(-90.0f));
+
+        CubeShader.use();
+        CubeShader.setvec3("u_ViewPos",camera.Position);
+
+        setDirLight(CubeShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.3),glm::vec3(0.008),glm::vec3(0.003));
+        setSpotLight(CubeShader, "spotlight",camera.Position,camera.Front,glm::vec3(2.1f),glm::vec3(0.8f),glm::vec3(0.01f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(18.5f)),FlashLight::flashlightOn);
+        setPointLight(CubeShader, "pointLights[0]", lightPositions[10],glm::vec3(1.7f), glm::vec3(0.5f), glm::vec3(0.4f),1.0f, 0.09f, 0.032f);     
 
         LightCubeShader.use();
         glm::mat4 LightCubeMatrix = glm::mat4(1.0f);
         LightCubeMatrix = glm::translate(LightCubeMatrix,lightPositions[10]);
-        LightCubeShader.setMat4("u_Model",LightCubeMatrix);
-        LightCubeShader.setMat4("u_View",camera.GetViewMatrix());
-        LightCubeShader.setMat4("u_Projection",projectionMatrix);
+        setMatrices(LightCubeShader,LightCubeMatrix, projectionMatrix ,camera.GetViewMatrix());
         glBindVertexArray(CUBEVAO);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // enable wireframe
+
+        CubeShader.use();
+        glBindVertexArray(CUBEVAO);
+        glDrawArraysInstanced(GL_TRIANGLES,0,36,amount);
+        glBindVertexArray(0);
+
+
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // enable wireframe
+        shadowscene.Draw(HeightMapShader,glm::mat4(1.0f),camera.GetViewMatrix(),projectionMatrix);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe
 
         
 

@@ -46,10 +46,7 @@ struct Spotlight {
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
-uniform sampler2D shadowMap;
 uniform vec3 u_ViewPos;
-uniform float u_SpecularStrength;
-uniform bool SpecularEnabled;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform DirLight dirlight;
 uniform Spotlight spotlight;
@@ -66,12 +63,9 @@ vec3 Calcdirlight(DirLight light, vec3 normal, vec3 viewDir)
 
     vec3 ambient = light.ambient * texDiffuse;
     vec3 diffuse = light.diffuse * diff * texDiffuse;
-    vec3 specular = light.specular * spec * texSpecular * u_SpecularStrength;
+    vec3 specular = light.specular * spec * texSpecular ;
 
-    if (SpecularEnabled)
-        return specular;
-    else
-        return ambient + diffuse + specular;
+    return ambient + diffuse + specular;
 }
 
 
@@ -95,13 +89,12 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
     vec3 ambient = light.ambient * texDiffuse;
     vec3 diffuse = light.diffuse * diff * texDiffuse * intensity;
-    vec3 specular = light.specular * spec * texSpecular * intensity * u_SpecularStrength;
+    vec3 specular = light.specular * spec * texSpecular * intensity ;
 
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    if(SpecularEnabled)
-        return vec3(texture(texture_specular1, TexCoords).rgb);
+
     return ambient + diffuse + specular;
     
 }
@@ -131,49 +124,23 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     diffuse *= attenuation;
     specular *= attenuation;
     return (ambient + diffuse + specular);
-}
-float ShadowCalculation(vec4 fragPosLightSpace)
-{
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    if(projCoords.z > 1.0)
-        return 0.0;
-
-    float shadow = 0.0;
-    float bias = max(0.005 * (1.0 - dot(normalize(Normal), normalize(dirlight.direction))), 0.0005);
-    float samples = 4.0;
-    float offset = 1.0 / 1024.0; // assuming 1024x1024 shadow map size
-
-    for(float x = -1.5; x <= 1.5; x += 1.0)
-    {
-        for(float y = -1.5; y <= 1.5; y += 1.0)
-        {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * offset).r;
-            shadow += (projCoords.z - bias > pcfDepth) ? 1.0 : 0.0;
-        }
-    }
-    shadow /= (samples * samples);
-
-    return 0.0;
-}
-void main()
+}void main()
 {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(u_ViewPos - FragPos);
 
-    vec3 dirLightResult = Calcdirlight(dirlight, norm, viewDir);
-    float shadow = ShadowCalculation(FragPosLightSpace);
-    dirLightResult *= (1.0 - shadow);
+    vec3 result = vec3(0.0);
 
-    vec3 result = dirLightResult;
-
-    // for (int i = 0; i < NR_POINT_LIGHTS; i++)
-    //     result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+    
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
+
+    result += Calcdirlight(dirlight, norm, viewDir); // <- optional: directional light
+
     // Optional gamma correction
     // result = pow(result, vec3(1.0 / 2.2));
 
-    FragColor = vec4(clamp(result, 0.0, 1.0), 1.0);
+    FragColor = vec4(result, 1.0); // ✅ Use the computed lighting
 }

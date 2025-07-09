@@ -38,27 +38,27 @@ public:
     void Translate(Shader &shader,glm::mat4 &Model,glm::vec3 Position)
     {
             Model= glm::translate(Model , Position);
-            shader.setMat4("u_Model",Model);
+            shader.setMat4("model",Model);
         
     }
     void RotateX(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-        shader.setMat4("u_Model", model);
+        shader.setMat4("model", model);
 
     }
 
     void RotateY(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-        shader.setMat4("u_Model", model);
+        shader.setMat4("model", model);
     }  
 
     void RotateZ(Shader& shader, glm::mat4& model, float angle) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
-        shader.setMat4("u_Model", model);
+        shader.setMat4("model", model);
     }
     void Scale(Shader& shader,glm::mat4 model,float ScaleFactor){
         model = glm::scale(model,glm::vec3(ScaleFactor));
-        shader.setMat4("u_Model",model);
+        shader.setMat4("model",model);
     }
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -78,7 +78,7 @@ private:
 
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
-        std::cout <<  path <<std::endl;
+        std::cout << "MODEL LOADED "<<  path <<std::endl;
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).

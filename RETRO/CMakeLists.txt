@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 project(RETRO2025)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 # Set Assimp install folder here (make sure this is where assimpConfig.cmake is)
-#set(CMAKE_PREFIX_PATH "C:/Users/user/assimp/install" ${CMAKE_PREFIX_PATH})
-
+set(CMAKE_PREFIX_PATH "C:/msys64/mingw64" ${CMAKE_PREFIX_PATH})
 # GLFW via FetchContent
 include(FetchContent)
 FetchContent_Declare(
@@ -53,5 +52,5 @@ target_link_libraries(RETRO2025
     ${CMAKE_SOURCE_DIR}/Libs/glew-2.1.0/lib/Release/x64/glew32s.lib
     glfw
     OpenGL::GL
-    assimp
+    assimp::assimp
 )

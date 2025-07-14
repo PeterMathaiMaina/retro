@@ -168,6 +168,8 @@ void main()
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
     }
 
+    
+
     // Gamma correction
     // result = pow(result, vec3(1.0 / 2.2));
 

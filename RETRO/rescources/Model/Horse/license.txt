@@ -1,0 +1,11 @@
+Model Information:
+* title:	Horse free download
+* source:	https://sketchfab.com/3d-models/horse-free-download-9b77bb7542354b10bb7b4c6a25866724
+* author:	pgonarg (https://sketchfab.com/pgonarg)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Horse free download" (https://sketchfab.com/3d-models/horse-free-download-9b77bb7542354b10bb7b4c6a25866724) by pgonarg (https://sketchfab.com/pgonarg) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

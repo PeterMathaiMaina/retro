@@ -5,28 +5,6 @@ in vec2 texCoords;
 in vec3 TangentLightDir;
 in vec3 TangentViewDir;
 in vec3 TangentFragPos;
-in vec3 Normal;
-
-
-
-
-struct DirLight {
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    bool SpecularEnabled;
-};
-struct PointLight {
-    vec3 position;
-    float constant;
-    float linear;
-    float quadratic;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-#define NR_POINT_LIGHTS 1
 
 struct Spotlight {
     vec3 position;
@@ -49,15 +27,12 @@ struct Spotlight {
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 uniform sampler2D texture_normal1;
-uniform sampler2D texture_Displacement1;
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform DirLight dirlight;
 uniform Spotlight spotlight;
-uniform float ScaleHeight;
 
 
 vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 lightDir, vec3 viewDir, vec2 TexCoords)
 {
+    
     lightDir = normalize(lightDir);
     viewDir = normalize(viewDir);
 
@@ -89,25 +64,16 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 lightDir, vec3 viewDir, ve
     return ambient + diffuse + specular;
 }
 
+
 void main()
 {
-
-    vec3 norm  = texture(texture_normal1,texCoords).rgb ;
-
-    norm = normalize(norm * 2.0 - 1.0);   
+    vec3 norm = texture(texture_normal1, texCoords).rgb;
+    norm = normalize(norm * 2.0 - 1.0);
 
     vec3 result = vec3(0.0);
 
-    // for (int i = 0; i < NR_POINT_LIGHTS; i++)
-    //     result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-    
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, TangentLightDir, TangentViewDir, texCoords);
-
-    // result += Calcdirlight(dirlight, Normal, TangentViewDir); // <- optional: directional light
-
-    // Optional gamma correction
-    // result = pow(result, vec3(1.0 / 2.2));
-
-   FragColor = vec4(0.0,1.0 ,0.0,1.0);
+    FragColor = vec4(result, 1.0);
+    // FragColor = vec4(1.0);
 }

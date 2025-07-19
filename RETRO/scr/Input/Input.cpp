@@ -9,7 +9,7 @@
 #include "../../third_party/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
-void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn,Shader& shader) {
+void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn) {
     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);

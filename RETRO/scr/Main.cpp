@@ -1,3 +1,4 @@
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -144,8 +145,6 @@ int main(){
         return -1;
     }
 
-    std::cout << "THIS IS THE BEGIN OF THE END BITCH!!" << std::endl;
-
     float cubeVertices[] = 
     {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  0.0f,  0.0f, -1.0f,
@@ -229,12 +228,10 @@ int main(){
     glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(3* sizeof(float)));
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(5* sizeof(float)));
-
     unsigned int InstanceVBO; 
     glGenBuffers(1, &InstanceVBO);
     glBindBuffer(GL_ARRAY_BUFFER, InstanceVBO);
     glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-
     GLsizei vec4Size = sizeof(glm::vec4);
     glEnableVertexAttribArray(3); 
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, nullptr);
@@ -249,7 +246,6 @@ int main(){
     glVertexAttribDivisor(4, 1);
     glVertexAttribDivisor(5, 1);
     glVertexAttribDivisor(6, 1);
-    
     size_t vertexCount = sizeof(cubeVertices) / sizeof(float) / 8; 
     std::vector<glm::vec3> tangents = CalculateTangents(cubeVertices, vertexCount);
     GLuint CubeTangent;
@@ -258,83 +254,7 @@ int main(){
     glBufferData(GL_ARRAY_BUFFER, tangents.size() * sizeof(glm::vec3), tangents.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(7);
     glVertexAttribPointer(7,3,GL_FLOAT,GL_FALSE,sizeof(glm::vec3),nullptr);
-
-    glBindVertexArray(0);
-
-
-
-    // unsigned int TangentsVBO;
-    // glGenBuffers(1,&TangentsVBO);
-    // std::vector<float> vertexDataWithTangents;
-    // for (size_t i = 0; i < cubeVertices.size(); i += 8 * 3) {
-    //     // Vertex 0
-    //     glm::vec3 pos0 = glm::vec3(cubeVertices[i + 0], cubeVertices[i + 1], cubeVertices[i + 2]);
-    //     glm::vec2 uv0  = glm::vec2(cubeVertices[i + 3], cubeVertices[i + 4]);
-    //     glm::vec3 norm0 = glm::vec3(cubeVertices[i + 5], cubeVertices[i + 6], cubeVertices[i + 7]);
-
-    //     // Vertex 1
-    //     glm::vec3 pos1 = glm::vec3(cubeVertices[i + 8 + 0], cubeVertices[i + 8 + 1], cubeVertices[i + 8 + 2]);
-    //     glm::vec2 uv1  = glm::vec2(cubeVertices[i + 8 + 3], cubeVertices[i + 8 + 4]);
-    //     glm::vec3 norm1 = glm::vec3(cubeVertices[i + 8 + 5], cubeVertices[i + 8 + 6], cubeVertices[i + 8 + 7]);
-
-    //     // Vertex 2
-    //     glm::vec3 pos2 = glm::vec3(cubeVertices[i + 16 + 0], cubeVertices[i + 16 + 1], cubeVertices[i + 16 + 2]);
-    //     glm::vec2 uv2  = glm::vec2(cubeVertices[i + 16 + 3], cubeVertices[i + 16 + 4]);
-    //     glm::vec3 norm2 = glm::vec3(cubeVertices[i + 16 + 5], cubeVertices[i + 16 + 6], cubeVertices[i + 16 + 7]);
-
-    //     // Compute edges and delta UVs
-    //     glm::vec3 edge1 = pos1 - pos0;
-    //     glm::vec3 edge2 = pos2 - pos0;
-    //     glm::vec2 deltaUV1 = uv1 - uv0;
-    //     glm::vec2 deltaUV2 = uv2 - uv0;
-
-    //     float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-    //     glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
-    //     tangent = glm::normalize(tangent);
-
-    //     // Store data per vertex (now with tangent)
-    //     for (int v = 0; v < 3; ++v) {
-    //         int base = i + v * 8;
-    //         // Copy original data
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 0]); // pos.x
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 1]); // pos.y
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 2]); // pos.z
-
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 3]); // tex.u
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 4]); // tex.v
-
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 5]); // norm.x
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 6]); // norm.y
-    //         vertexDataWithTangents.push_back(cubeVertices[base + 7]); // norm.z
-
-    //         // Append same tangent for all 3 vertices (flat shading)
-    //         vertexDataWithTangents.push_back(tangent.x);
-    //         vertexDataWithTangents.push_back(tangent.y);
-    //         vertexDataWithTangents.push_back(tangent.z);
-    //     }
-    // }
-
-
-    // glBindVertexArray(0);
-
-
-    unsigned int LightCubeVAO,LightCubeVBO;
-    glGenVertexArrays(1,&LightCubeVAO);
-    glGenBuffers(1,&LightCubeVBO);
-    glBindVertexArray(LightCubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER,LightCubeVBO);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(cubeVertices),&cubeVertices,GL_STATIC_DRAW);
-;
-
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8*sizeof(float),nullptr);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(3* sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8*sizeof(float),(void*)(5* sizeof(float)));
-    
-
-
 
     Camera* cameraPtr = &camera;
     setupcallbacks(window,cameraPtr);
@@ -342,63 +262,51 @@ int main(){
     glfwWindowHint(GLFW_SAMPLES,4);
 
     Input input;
+    Model Bunny("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\bunny\\scene.gltf");
+    Model Tree("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\tree\\scene.gltf");
+    GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    GLint DiffuseMap = TextureFromFile("bricks2.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    GLint NormalMap = TextureFromFile("bricks2_normal.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png" , 2.0);
+    glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.001f, 2000.0f);
     Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\Goemetry\\GL_CUBE.geom" );
     Shader HouseShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.frag", nullptr);
     Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
     Shader DepthShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_SHADOW.frag", nullptr);
     Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
     Shader Pointshadows("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBESHADOW.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBESHADOW.frag", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\Geometry\\GL_CUBESHADOW.geom");
-    // Model Oldhouse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Room\\scene.gltf");
-    // Model Bench1("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Bench1\\Bench.fbx");
-    // Model Tree("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\tree\\scene.gltf");
-    // Model Sphere("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\sphere\\Untitled.obj");
-    // Model Horse("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\Horse\\scene.gltf");
-    // Model Dino("C:\\Users\\user\\retro\\RETRO\\rescources\\Model\\jwa-distortus-rex\\source\\Distortus\\Dino.obj");
-    GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    GLint DiffuseMap = TextureFromFile("bricks2.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    GLint NormalMap = TextureFromFile("bricks2_normal.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    // GLint TerrainTexture = TextureFromFile("Grass005_4K-JPG_Displacement.dds","C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed");
-    HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Compressed\\Tiles012_4K-JPG_Roughness.jpg" , 20.0);
-
-    std::cout << "VAO: " << shadowscene.GetHeightMapVAO() << std::endl;
-    std::cout << "Indices count: " << shadowscene.GetIndices().size() << std::endl;
-    std::cout << "Vertices count: " << shadowscene.GetVertices().size() << std::endl;
+    Shader BunnyShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.vert","C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.frag", nullptr);
 
 
-    unsigned int DepthMapFBO;
-    glGenFramebuffers(1,&DepthMapFBO);
-    unsigned int ShadowMap;
-    glBindFramebuffer(GL_FRAMEBUFFER,DepthMapFBO);
-    glGenTextures(1,&ShadowMap);
-    glBindTexture(GL_TEXTURE_2D,ShadowMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // white = not in shadow
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, ShadowMap, 0);    
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE); 
-    glBindFramebuffer(GL_FRAMEBUFFER,0);
+    //  SETTING THE UNIFORMS
+    // Bunny Shader
+    glm::mat4 BunnyMatrix = 1.0f;
+    BunnyMatrix = glm::scale (BunnyMatrix,glm::vec3(0.4));
+    BunnyShader.setMat4("model",BunnyMatrix);
+    BunnyShader.setMat4("projection",projectionMatrix);
+    BunnyShader.setvec3("aSpotlightPositon",lightPositions[10]);
+    setSpotLight(BunnyShader,"spotlight",lightPositions[10],glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.7f),glm::vec3(0.8f),glm::vec3(0.01f),1.0f, 0.02f, 0.004f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(12.5f)),FlashLight::flashlightOn);
+    // Cube Shader
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, DiffuseMap);  
+    CubeShader.setInt("texture_diffuse1", 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, SpecularMap);
+    CubeShader.setInt("texture_specular1", 1);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, NormalMap);  
+    CubeShader.setInt("texture_normal1", 2);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, DisplacmentMap);  
+    CubeShader.setInt("texture_Displacement1", 3);
+    CubeShader.setvec3("aSpotlightPositon",lightPositions[10]);
 
-    
-    glm::mat4 projectionMatrix =glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.001f, 2000.0f);
-    glm::mat4 LightProjection , LightView;
-    glm::mat4 LightSpaceMatrix;
-    LightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 30.0f);
-    LightView = glm::lookAt( glm::vec3(0.0f, 10.0f, 0.0f),glm::vec3(0.0f),glm::vec3(0.0f,0.0f,-1.0f));
-    LightSpaceMatrix = LightProjection * LightView;
-
-
-
-    // Pass to shader
-    DepthShader.use();
-    DepthShader.setMat4("lightSpaceMatrix", LightSpaceMatrix);
-
-
+    // LightCubeShader
+    glm::mat4 LightCubeMatrix = glm::mat4(1.0f);
+    LightCubeMatrix = glm::translate(LightCubeMatrix,lightPositions[10]);
+    LightCubeShader.setMat4("model",LightCubeMatrix);
+    LightCubeShader.setMat4("projection",projectionMatrix);
 
 
     while (!glfwWindowShouldClose(window)) {
@@ -408,63 +316,19 @@ int main(){
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         // std::cout << "X: "<< cameraPtr->Position.x << "Y: "<< cameraPtr->Position.y << "Z: "<< cameraPtr->Position.z <<std::endl;
+        input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn);
+        
 
-        input.processInput(window,deltaTime,camera,FlashLight::flashlightTogglePressed,FlashLight::flashlightOn,CubeShader);
+        BunnyShader.setMat4("view",camera.GetViewMatrix());
+        BunnyShader.setvec3("viewPos",cameraPtr->Position);
 
+        CubeShader.setvec3("viewPos",cameraPtr->Position);
 
-        HouseShader.use();
-        glm::mat4 HouseModelMat = glm::mat4(1.0f);
-        HouseModelMat = glm::scale(HouseModelMat,glm::vec3(1.0f));
-        HouseShader.setMat4("model",HouseModelMat);
-        HouseShader.setMat4("projection",projectionMatrix);
-        HouseShader.setMat4("view",camera.GetViewMatrix());
-
-        setDirLight(HouseShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.06),glm::vec3(0.8),glm::vec3(0.003));
-        setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front,glm::vec3(0.4f),glm::vec3(1.6f),glm::vec3(0.3f),1.0f, 0.09f, 0.032f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(18.5f)),FlashLight::flashlightOn);
-        setPointLight(HouseShader, "pointLights[0]", lightPositions[10],glm::vec3(1.7f), glm::vec3(0.5f), glm::vec3(1.0f),1.0f, 0.09f, 0.032f);     
-        glm::vec3 pivot = glm::vec3(-0.346708f, 1.86082f, -0.629334f); 
-        glm::mat4 SphereModel = GetRotationAroundYPoint(pivot,1.0f, 0.2f, 0.5f);
-        CubeShader.use();
-        CubeShader.setMat4("view",camera.GetViewMatrix());
-        CubeShader.setMat4("projection",projectionMatrix);
-        CubeShader.setFloat("ScaleHeight",10.04);
-        // SphereModel = glm::translate(SphereModel, glm::vec3(-5.0f,0.0f,0.0f));
-
+        LightCubeShader.setMat4("view",camera.GetViewMatrix());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        CubeShader.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, DiffuseMap);  
-        CubeShader.setInt("texture_diffuse1", 0);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, SpecularMap);
-        CubeShader.setInt("texture_specular1", 1);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, NormalMap);  
-        CubeShader.setInt("texture_normal1", 2);
-
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, DisplacmentMap);  
-        CubeShader.setInt("texture_Displacement1", 3);
-
-        HouseShader.use();
-        HouseShader.setMat4("model",HouseModelMat);
-
-        // Horse.Draw(HouseShader);
-        CubeShader.use();
-        CubeShader.setvec3("viewPos",camera.Position);
-        CubeShader.setvec3("aSpotlightPositon",lightPositions[10]);
-
-        setDirLight(CubeShader, glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f)),glm::vec3(0.3),glm::vec3(0.008),glm::vec3(0.003));
-        setSpotLight(CubeShader, "spotlight",lightPositions[10],glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.7f),glm::vec3(0.8f),glm::vec3(0.01f),1.0f, 0.02f, 0.004f,glm::cos(glm::radians(10.5f)),glm::cos(glm::radians(12.5f)),FlashLight::flashlightOn);
-        setPointLight(CubeShader, "pointLights[0]", lightPositions[10],glm::vec3(1.7f), glm::vec3(0.8f), glm::vec3(0.4f),1.0f, 0.09f, 0.032f);     
 
         LightCubeShader.use();
-
-        glm::mat4 LightCubeMatrix = glm::mat4(1.0f);
-        LightCubeMatrix = glm::translate(LightCubeMatrix,lightPositions[0]);
-        setMatrices(LightCubeShader,LightCubeMatrix, projectionMatrix ,camera.GetViewMatrix());
         glBindVertexArray(CUBEVAO);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
@@ -476,9 +340,10 @@ int main(){
 
 
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // enable wireframe
-        // std::cout << "SCENE DROWN:" << "SHADOW SCENE"<< std::endl;
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
         shadowscene.Draw(HeightMapShader,glm::mat4(1.0f),camera.GetViewMatrix(),projectionMatrix);
+        Tree.Draw(BunnyShader);
+        // Bunny.Draw(BunnyShader );
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // disable wireframe
 
         
@@ -498,4 +363,3 @@ int main(){
     glfwTerminate();
     return 0;
 }
-

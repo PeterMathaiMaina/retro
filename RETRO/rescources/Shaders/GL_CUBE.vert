@@ -22,7 +22,6 @@ void main()
 {
     mat4 model = instanceModel;
 
-    // Transform position and normal to world space
     vec3 FragPosWorld = vec3(model * vec4(aPos, 1.0));
     vec3 T = normalize(mat3(model) * tangent);
     vec3 N = normalize(mat3(transpose(inverse(model))) * aNormal);

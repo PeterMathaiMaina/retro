@@ -8,7 +8,7 @@
 
 class Input {
 public:
-    void processInput(GLFWwindow* window, float& deltaTime,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn,Shader &shader);
+    void processInput(GLFWwindow* window, float& deltaTime,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn);
 };
 
 #endif

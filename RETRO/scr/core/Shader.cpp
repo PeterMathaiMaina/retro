@@ -8,6 +8,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 
     vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    std::cout << "Loading shader: " << vertexPath << std::endl;
+    std::cout << "Loading shader: " << fragmentPath << std::endl;
+    if (geometryPath != nullptr)
+        std::cout << "Loading shader: " << geometryPath << std::endl;
+        
 
     if (geometryPath)
         gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);

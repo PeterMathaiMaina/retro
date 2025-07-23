@@ -1,0 +1,117 @@
+# Blender 4.4.3 MTL File: 'None'
+# www.blender.org
+
+newmtl Block02
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Block02_baseColor.dds
+map_Bump -bm 1.000000 ../textures/Block02_normal.dds
+
+newmtl Concrete02_basecolor
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Concrete02_basecolor_baseColor.dds
+#map_Bump -bm 1.000000 ../textures/Concrete02_basecolor_normal.dds
+
+newmtl Door
+Ns 289.750000
+Ka 0.169143 0.169143 0.169143
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../textures/Door_baseColor.dds
+
+newmtl Glass01
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Glass01_baseColor.dds
+
+newmtl Gutter
+Ns 710.728455
+Ka 0.089905 0.089905 0.089905
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../textures/Gutter_baseColor.dds
+
+newmtl WindowMetal
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/WindowMetal_baseColor.dds
+
+newmtl Wood
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+#map_Kd ../textures/WoodFloor041_1K-JPG_Color.dds
+map_Kd ../textures/Wood_baseColor.dds
+map_Bump -bm 1.000000 ../textures/Wood_normal.dds
+
+newmtl edge_color000255
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl material
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl material_0
+Ns 159.999985
+Ka 1.000000 1.000000 1.000000
+Kd 0.643137 0.698039 0.733333
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl roof
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/roof_baseColor.dds
+map_Bump -bm 1.000000 ../textures/roof_normal.dds

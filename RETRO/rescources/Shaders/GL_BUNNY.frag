@@ -75,5 +75,6 @@ void main()
     if (spotlight.enabled)
         result += CalcSpotLight(spotlight, norm, TangentLightDir, TangentViewDir, texCoords);
     FragColor = vec4(result, 1.0);
+    // FragColor = vec4(texCoords.x,texCoords.y, 0.0, 1.0); // Even better: visualize UVs directly
     // FragColor = vec4(1.0);
 }

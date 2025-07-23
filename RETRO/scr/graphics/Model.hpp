@@ -61,7 +61,6 @@ public:
         shader.setMat4("model",model);
     }
 private:
-    // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)
     {
         // read file via ASSIMP
@@ -79,7 +78,7 @@ private:
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
 
-        std::cout << "MODEL LOADED "<<  path <<std::endl;
+        std::cout << path <<std::endl;
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).

@@ -28,15 +28,6 @@ void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,boo
     }
 
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
-        //std::cout << "FUCKED TWIT!!!!"<<std::endl;
         flashlightTogglePressed = false;
     }
 

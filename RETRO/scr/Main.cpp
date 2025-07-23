@@ -326,11 +326,12 @@ int main(){
     // TreeShader.setMat4("model", treeMat);
     //HouseShader
     HouseShader.use();
-    glm::mat4 HouseMat= glm::mat4(1.0f);
-    HouseMat = glm::translate(HouseMat,glm::vec3(48.2f,-4.40f,0.0f));
-    HouseMat = glm::scale(HouseMat,glm::vec3(1.3f));
-    HouseShader.setMat4("model",HouseMat);
+    glm::mat4 houseMat= glm::mat4(1.0f);
+    houseMat = glm::translate(houseMat,glm::vec3(48.2f,-4.40f,0.0f));
+    houseMat = glm::scale(houseMat,glm::vec3(1.3f));
+    HouseShader.setMat4("model",houseMat);
     HouseShader.setMat4("projection",projectionMatrix);
+    setPointLight(HouseShader,"pointlight",lightPositions[0],glm::vec3(1.0f),glm::vec3(1.0f),glm::vec3(1.0f),1.0f,0.09f, 0.032f);
 
 
 
@@ -358,7 +359,7 @@ int main(){
         LightCubeShader.setMat4("view",cameraPtr->GetViewMatrix());
         HouseShader.use();
         HouseShader.setMat4("view",cameraPtr->GetViewMatrix());
-
+        HouseShader.setvec3("viewpos",cameraPtr->Position);
 
         LightCubeShader.use();
         glBindVertexArray(CUBEVAO);
@@ -368,6 +369,7 @@ int main(){
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
         shadowscene.Draw(HeightMapShader,glm::mat4(1.0f),camera.GetViewMatrix(),projectionMatrix);
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
         for(unsigned int i = 0;i < 3;i++)
         {

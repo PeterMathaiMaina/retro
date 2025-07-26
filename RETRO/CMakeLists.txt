@@ -23,6 +23,9 @@ find_package(assimp REQUIRED)
 
 add_executable(RETRO2025
     scr/Main.cpp
+    scr/Renderer/Renderer.cpp
+    scr/assetManager/GlobalDeclarations.cpp
+    scr/assetManager/InputState.h
     scr/core/Shader.cpp
     third_party/imageprocessing/stb_image.cpp
     scr/Input/Input.cpp
@@ -34,6 +37,8 @@ add_executable(RETRO2025
 
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
+    ${CMAKE_SOURCE_DIR}/scr/assetManager
+    ${CMAKE_SOURCE_DIR}/scr/Renderer
     ${CMAKE_SOURCE_DIR}/scr/Shader
     ${CMAKE_SOURCE_DIR}/scr/core
     ${CMAKE_SOURCE_DIR}/scr/graphics

@@ -10,7 +10,7 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd ../textures/Block02_baseColor.dds
-map_Bump -bm 1.000000 ../textures/Block02_normal.dds
+#map_Bump -bm 1.000000 ../textures/Block02_normal.dds
 
 newmtl Concrete02_basecolor
 Ns 250.000000
@@ -71,9 +71,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-#map_Kd ../textures/WoodFloor041_1K-JPG_Color.dds
 map_Kd ../textures/Wood_baseColor.dds
-map_Bump -bm 1.000000 ../textures/Wood_normal.dds
+#map_Bump -bm 1.000000 ../textures/Wood_normal.dds
 
 newmtl edge_color000255
 Ns 159.999985
@@ -113,5 +112,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
+#map_Kd ../textures/WoodFloor041_1K-JPG_Color.dds
 map_Kd ../textures/roof_baseColor.dds
-map_Bump -bm 1.000000 ../textures/roof_normal.dds
+#map_Bump -bm 1.000000 ../textures/roof_normal.dds

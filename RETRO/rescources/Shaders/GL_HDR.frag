@@ -17,4 +17,5 @@ void main() {
     mapped = pow(mapped, vec3(1.0 / 2.2));
 
     FragColor = vec4(mapped, 1.0);
+    // FragColor = texture(hdrBuffer,TexCoords);
 }

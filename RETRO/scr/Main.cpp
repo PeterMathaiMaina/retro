@@ -24,7 +24,7 @@
 #include <bitset>
 #include "Shader/ShaderSetup.h"
 
-const unsigned int WINDOW_WIDTH = 2000, WINDOW_HEIGHT = 1200;
+const unsigned int WINDOW_WIDTH = 1800, WINDOW_HEIGHT = 1000;
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 float aspect = static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT;
 float shd_aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
@@ -145,6 +145,13 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,HDRtexture,0);
+
+    GLuint rboDepth;
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "HDR FRAMEBUFFER FAILED TO COMPLETE" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
@@ -207,7 +214,7 @@ int main() {
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
     HouseShader.setMat4("model", houseMat);
     HouseShader.setMat4("projection", projectionMatrix);
-    setPointLight(HouseShader, "pointlight", lightPositions[0],glm::vec3(5,0,0),glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    setPointLight(HouseShader, "pointlight", glm::vec3(10,0,0),lightPositions[0],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
     // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
     glViewport(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
@@ -237,18 +244,11 @@ int main() {
         House.Draw(HouseShader);
         Tree.Draw(TreeShader);
         Bunny.Draw(BunnyShader);
-
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        
-
-        // Bind default framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Disable depth testing for quad
         glDisable(GL_DEPTH_TEST);
@@ -256,7 +256,7 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
         HDRShader.setInt("hdrBuffer", 0);
-        HDRShader.setFloat("exposure", 1.0f);  
+        HDRShader.setFloat("exposure", 0.215f);  
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);

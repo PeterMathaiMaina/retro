@@ -24,7 +24,7 @@ void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,boo
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !flashlightTogglePressed) {
         flashlightTogglePressed = true;
         flashlightOn = !flashlightOn;  
-        // std::cout << "Flashlight : " << (flashlightOn ? "ON" : "OFF") << std::endl;
+        std::cout << "Flashlight : " << (flashlightOn ? "ON" : "OFF") << std::endl;
     }
 
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {

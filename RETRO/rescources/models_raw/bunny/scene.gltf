@@ -170,10 +170,10 @@
       "uri": "../textures/Default_Material1_baseColor.dds"
     },
     {
-      "uri": "../textures/Default_Material1_metallicRoughness.png"
+      "uri": "../textures/Default_Material1_metallicRoughness.dds"
     },
     {
-      "uri": "../textures/Default_Material1_normal.png"
+      "uri": "../textures/Default_Material1_normal.dds"
     }
   ],
   "materials": [

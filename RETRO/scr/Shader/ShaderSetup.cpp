@@ -6,10 +6,11 @@ void setDirLight(Shader& shader, const glm::vec3& direction,
     shader.setvec3("dirlight.diffuse", diffuse);
     shader.setvec3("dirlight.specular", specular);
 }
-void setPointLight(Shader& shader, const std::string& name, const glm::vec3& position,
+void setPointLight(Shader& shader, const std::string& name,const glm::vec3& color, const glm::vec3& position,
                    const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular,
                    float constant, float linear, float quadratic) {
     shader.setvec3(name + ".position", position);
+    shader.setvec3(name + ".color", color);
     shader.setvec3(name + ".ambient", ambient);
     shader.setvec3(name + ".diffuse", diffuse);
     shader.setvec3(name + ".specular", specular);

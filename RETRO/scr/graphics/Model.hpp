@@ -203,7 +203,6 @@ private:
                 aiString str;
                 mat->GetTexture(type, i, &str);
             
-                // Check if texture was loaded before to avoid duplication
                 bool skip = false;
                 for (unsigned int j = 0; j < textures_loaded.size(); j++) {
                     if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {

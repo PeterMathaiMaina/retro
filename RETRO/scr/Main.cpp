@@ -92,6 +92,7 @@ std::vector<glm::vec3> CalculateTangents(const float* vertices, size_t vertexCou
     return tangents;
 }
 
+
 int main() {
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -108,97 +109,45 @@ int main() {
         std::cerr << "GLEW initialization failed!" << std::endl;
         return -1;
     }
-    float cubeVertices[] = {
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f
+    float quadVertices[] = {
+        -1.0f,  1.0f,   0.0f, 1.0f,
+        -1.0f, -1.0f,   0.0f, 0.0f,
+        1.0f, -1.0f,   1.0f, 0.0f,
+
+        -1.0f,  1.0f,   0.0f, 1.0f,
+        1.0f, -1.0f,   1.0f, 0.0f,
+        1.0f,  1.0f,   1.0f, 1.0f
     };
-    unsigned int amount = 700;
-    glm::mat4* modelMatrices = new glm::mat4[amount];
-    srand(static_cast<unsigned int>(glfwGetTime()));
-    for (unsigned int i = 0; i < amount; i++) {
-        glm::mat4 model = glm::mat4(1.0f);
-        float x = (rand() % 200 - 100);
-        float y = (rand() % 70 - 10);
-        float z = (rand() % 200 - 100);
-        model = glm::translate(model, glm::vec3(x, y, z));
-        float angle = static_cast<float>(rand() % 360);
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(0.4f, 0.6f, 0.8f));
-        float scale = static_cast<float>((rand() % 40) / 10.0f + 2.8f);
-        model = glm::scale(model, glm::vec3(scale));
-        modelMatrices[i] = model;
-    }
-    unsigned int CUBEVAO, CUBEVBO;
-    glGenVertexArrays(1, &CUBEVAO);
-    glGenBuffers(1, &CUBEVBO);
-    glBindVertexArray(CUBEVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, CUBEVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+    GLuint quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-    unsigned int InstanceVBO;
-    glGenBuffers(1, &InstanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, InstanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-    GLsizei vec4Size = sizeof(glm::vec4);
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, nullptr);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
-    glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
-    glVertexAttribDivisor(3, 1);
-    glVertexAttribDivisor(4, 1);
-    glVertexAttribDivisor(5, 1);
-    glVertexAttribDivisor(6, 1);
-    size_t vertexCount = sizeof(cubeVertices) / sizeof(float) / 8;
-    std::vector<glm::vec3> tangents = CalculateTangents(cubeVertices, vertexCount);
-    GLuint CubeTangent;
-    glGenBuffers(1, &CubeTangent);
-    glBindBuffer(GL_ARRAY_BUFFER, CubeTangent);
-    glBufferData(GL_ARRAY_BUFFER, tangents.size() * sizeof(glm::vec3), tangents.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(7);
-    glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), nullptr);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+    glBindVertexArray(0); 
+
+
+    GLuint HDRfrb;
+    glGenFramebuffers(1,&HDRfrb);
+    glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
+    GLuint HDRtexture;
+    glGenTextures(1,&HDRtexture);
+    glBindTexture(GL_TEXTURE_2D,HDRtexture);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA16F,WINDOW_WIDTH,WINDOW_HEIGHT,0,GL_RGBA,GL_FLOAT,NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,HDRtexture,0);
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "HDR FRAMEBUFFER FAILED TO COMPLETE" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
     Camera* cameraPtr = &camera;
     setupcallbacks(window, cameraPtr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -206,13 +155,13 @@ int main() {
     Model Bunny("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\bunny\\scene.gltf");
     Model House("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\House1\\House.obj");
     Model Tree("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\tree\\TreeLarge_0.obj");
-    Model CharacterModel("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\CharacterModel\\Man_test_4.obj");
+    // Model CharacterModel("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\CharacterModel\\Man_test_4.obj");
 
-    GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    GLint DiffuseMap = TextureFromFile("bricks2.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    GLint NormalMap = TextureFromFile("bricks2_normal.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    HeightMap shadowscene("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png", 5.0);
+    //GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    //GLint DiffuseMap = TextureFromFile("bricks2.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    //GLint NormalMap = TextureFromFile("bricks2_normal.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    //GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
+    HeightMap heightmap("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png", 5.0);
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
     Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr);
     Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
@@ -220,6 +169,7 @@ int main() {
     Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
     Shader BunnyShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.frag", nullptr);
     Shader TreeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.frag", nullptr);
+    Shader HDRShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.frag", nullptr);
     BunnyShader.use();
     glm::mat4 BunnyMatrix = glm::mat4(1.0f);
     BunnyMatrix = glm::scale(BunnyMatrix, glm::vec3(0.7));
@@ -228,20 +178,20 @@ int main() {
     BunnyShader.setMat4("projection", projectionMatrix);
     BunnyShader.setvec3("aSpotlightPositon", lightPositions[10]);
     setSpotLight(BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
-    CubeShader.use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, DiffuseMap);
-    CubeShader.setInt("texture_diffuse1", 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, SpecularMap);
-    CubeShader.setInt("texture_specular1", 1);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, NormalMap);
-    CubeShader.setInt("texture_normal1", 2);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, DisplacmentMap);
-    CubeShader.setInt("texture_Displacement1", 3);
-    CubeShader.setvec3("aSpotlightPositon", lightPositions[10]);
+    //CubeShader.use();
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, DiffuseMap);
+    //CubeShader.setInt("texture_diffuse1", 0);
+    //glActiveTexture(GL_TEXTURE1);
+    //glBindTexture(GL_TEXTURE_2D, SpecularMap);
+    //CubeShader.setInt("texture_specular1", 1);
+    //glActiveTexture(GL_TEXTURE2);
+    //glBindTexture(GL_TEXTURE_2D, NormalMap);
+    //CubeShader.setInt("texture_normal1", 2);
+    //glActiveTexture(GL_TEXTURE3);
+    //glBindTexture(GL_TEXTURE_2D, DisplacmentMap);
+    //CubeShader.setInt("texture_Displacement1", 3);
+    //CubeShader.setvec3("aSpotlightPositon", lightPositions[10]);
     LightCubeShader.use();
     glm::mat4 LightCubeMatrix = glm::mat4(1.0f);
     LightCubeMatrix = glm::translate(LightCubeMatrix, lightPositions[10]);
@@ -249,23 +199,27 @@ int main() {
     LightCubeShader.setMat4("projection", projectionMatrix);
     TreeShader.use();
     glm::mat4 treeMat = glm::mat4(1.0f);
+    treeMat = glm::translate(treeMat, lightPositions[0]);
+    TreeShader.setMat4("model", treeMat);
     HouseShader.use();
     glm::mat4 houseMat = glm::mat4(1.0f);
     houseMat = glm::translate(houseMat, glm::vec3(48.2f, -4.40f, 0.0f));
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
     HouseShader.setMat4("model", houseMat);
     HouseShader.setMat4("projection", projectionMatrix);
-    setPointLight(HouseShader, "pointlight", lightPositions[0], glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    setPointLight(HouseShader, "pointlight", lightPositions[0],glm::vec3(5,0,0),glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
+    glViewport(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
+        
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glDepthMask(GL_TRUE);
         glEnable(GL_MULTISAMPLE);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         input.processInput(window, deltaTime, camera, FlashLight::flashlightTogglePressed, FlashLight::flashlightOn);
         TreeShader.use();
         TreeShader.setMat4("projection", projectionMatrix);
@@ -278,17 +232,36 @@ int main() {
         HouseShader.use();
         HouseShader.setMat4("view", cameraPtr->GetViewMatrix());
         HouseShader.setvec3("viewpos", cameraPtr->Position);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        shadowscene.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        for (unsigned int i = 0; i < 3; i++) {
-            treeMat = glm::translate(treeMat, lightPositions[i]);
-            TreeShader.setMat4("model", treeMat);
-            Tree.Draw(TreeShader);
-            treeMat = glm::mat4(1.0f);
-        }
-        Bunny.Draw(BunnyShader);
+        glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         House.Draw(HouseShader);
+        Tree.Draw(TreeShader);
+        Bunny.Draw(BunnyShader);
+
+        glBindFramebuffer(GL_FRAMEBUFFER,0);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        
+
+        // Bind default framebuffer
+
+        // Disable depth testing for quad
+        glDisable(GL_DEPTH_TEST);
+        HDRShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, HDRtexture);
+        HDRShader.setInt("hdrBuffer", 0);
+        HDRShader.setFloat("exposure", 1.0f);  
+        glBindVertexArray(quadVAO); 
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+        glEnable(GL_DEPTH_TEST);
+
         auto endTime = hr_clock::now();
         std::chrono::duration<double> elapsed = endTime - startTime;
         double frameTime = elapsed.count();

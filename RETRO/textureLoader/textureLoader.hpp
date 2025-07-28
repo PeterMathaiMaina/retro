@@ -9,7 +9,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory);
 unsigned int LoadCompressedTexture(const std::string& path);
 unsigned int LoadTextureWithSTB(const std::string& fullPath);
 unsigned int loadKTXCubemap(const std::string& ktxPath) ;
-unsigned int LoadHeightMap(const std::string& HeightMapPath) ;
+unsigned int LoadHeightMapTexture(const std::string& HeightMapPath) ;
 
 
 #endif

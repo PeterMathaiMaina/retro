@@ -155,6 +155,9 @@ int main() {
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "HDR FRAMEBUFFER FAILED TO COMPLETE" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+    GLuint HeightmapTexture = LoadHeightMapTexture("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png");
+
     Camera* cameraPtr = &camera;
     setupcallbacks(window, cameraPtr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -214,7 +217,8 @@ int main() {
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
     HouseShader.setMat4("model", houseMat);
     HouseShader.setMat4("projection", projectionMatrix);
-    setPointLight(HouseShader, "pointlight", glm::vec3(10,0,0),lightPositions[0],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    setPointLight(HouseShader, "pointlight", glm::vec3(0.5,0.5,0.5),lightPositions[0],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+
     // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
     glViewport(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
@@ -239,14 +243,21 @@ int main() {
         HouseShader.use();
         HouseShader.setMat4("view", cameraPtr->GetViewMatrix());
         HouseShader.setvec3("viewpos", cameraPtr->Position);
+
         glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         House.Draw(HouseShader);
         Tree.Draw(TreeShader);
         Bunny.Draw(BunnyShader);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        HeightMapShader.use();
+        glActiveTexture(GL_TEXTURE0);  
+        glBindTexture(GL_TEXTURE_2D, HeightmapTexture);
+        HeightMapShader.setInt("terrain_texture", 0);
         heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glBindFramebuffer(GL_FRAMEBUFFER,0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -256,7 +267,7 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
         HDRShader.setInt("hdrBuffer", 0);
-        HDRShader.setFloat("exposure", 0.215f);  
+        HDRShader.setFloat("exposure", 0.115f);  
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);

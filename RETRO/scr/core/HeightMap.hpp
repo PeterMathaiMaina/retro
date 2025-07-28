@@ -27,7 +27,7 @@ struct HeightMap {
         unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 1); // Force grayscale
 
         if (!data) {
-            std::cerr << "❌ Failed to load heightmap: " << path << std::endl;
+            std::cerr << "Failed to load heightmap: " << path << std::endl;
             return;
         }
 

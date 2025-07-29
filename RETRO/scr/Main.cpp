@@ -91,6 +91,51 @@ std::vector<glm::vec3> CalculateTangents(const float* vertices, size_t vertexCou
     }
     return tangents;
 }
+float cubeVertices[] = {
+
+    -0.5f, -0.5f,  0.5f,  
+     0.5f, -0.5f,  0.5f,  
+     0.5f,  0.5f,  0.5f,  
+     0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+
+    -0.5f, -0.5f, -0.5f,  
+    -0.5f,  0.5f, -0.5f,  
+     0.5f,  0.5f, -0.5f,  
+     0.5f,  0.5f, -0.5f,  
+     0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+
+    -0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+
+     0.5f,  0.5f,  0.5f,  
+     0.5f, -0.5f,  0.5f,  
+     0.5f, -0.5f, -0.5f,  
+     0.5f, -0.5f, -0.5f,  
+     0.5f,  0.5f, -0.5f,  
+     0.5f,  0.5f,  0.5f,  
+
+    -0.5f,  0.5f, -0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+     0.5f,  0.5f,  0.5f,  
+     0.5f,  0.5f,  0.5f,  
+     0.5f,  0.5f, -0.5f,  
+    -0.5f,  0.5f, -0.5f,  
+
+    -0.5f, -0.5f, -0.5f,  
+     0.5f, -0.5f, -0.5f,  
+     0.5f, -0.5f,  0.5f,  
+     0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f, -0.5f  
+};
+
 
 
 int main() {
@@ -125,15 +170,16 @@ int main() {
     glBindVertexArray(quadVAO);
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
     glBindVertexArray(0); 
 
+    GLuint cubeVBO, cubeVAO;
+    glGenVertexArrays(1,&cubeVAO);
+    glGenVertexArrays(1,&cubeVBO);
+    
 
     GLuint HDRfrb;
     glGenFramebuffers(1,&HDRfrb);
@@ -249,7 +295,9 @@ int main() {
         House.Draw(HouseShader);
         Tree.Draw(TreeShader);
         Bunny.Draw(BunnyShader);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         HeightMapShader.use();
         glActiveTexture(GL_TEXTURE0);  
         glBindTexture(GL_TEXTURE_2D, HeightmapTexture);
@@ -257,7 +305,8 @@ int main() {
         heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
 
 
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         glBindFramebuffer(GL_FRAMEBUFFER,0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -267,7 +316,7 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
         HDRShader.setInt("hdrBuffer", 0);
-        HDRShader.setFloat("exposure", 0.115f);  
+        HDRShader.setFloat("exposure", 0.7515f);  
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);

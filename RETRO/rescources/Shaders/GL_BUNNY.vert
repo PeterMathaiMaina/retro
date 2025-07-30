@@ -14,6 +14,7 @@ out vec3 TangentLightDir;
 out vec3 TangentViewDir;
 out vec3 TangentFragPos;
 out vec3 Normal; 
+out vec3 fragPos; 
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -24,6 +25,7 @@ uniform mat4 model;
 void main()
 {
     vec3 FragPosWorld = vec3(model * vec4(aPos, 1.0));
+    fragPos = FragPosWorld;
     vec3 T = normalize(mat3(model) * tangent);
     vec3 N = normalize(mat3(transpose(inverse(model))) * aNormal); 
     vec3 B = normalize(cross(N, T));

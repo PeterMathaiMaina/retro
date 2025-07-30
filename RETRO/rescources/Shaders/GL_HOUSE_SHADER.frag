@@ -55,7 +55,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 texDiffuse = texture(texture_diffuse1, TexCoords).rgb;
     vec3 texSpecular = texture(texture_specular1, TexCoords).rgb;
 
-    vec3 ambient = light.ambient * texDiffuse * light.color;
+    // vec3 lightcolor = light.color * (attenuation / 5);
+
+    vec3 ambient = light.ambient * texDiffuse  ;//lightcolor;
 
     vec3 diffuse = light.diffuse * diff * texDiffuse ;
     vec3 specular = light.specular * spec * texSpecular;
@@ -102,10 +104,10 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewpos - fragPos);
     vec3 result = CalcPointLight(pointlight, norm, fragPos, viewDir);
-    // if (spotlight.enabled)
-    // {
-    //     result += calcspotlight(spotlight,viewDir,norm,fragPos,TexCoords);
-    // }
+    if (spotlight.enabled)
+    {
+        result += calcspotlight(spotlight,viewDir,norm,fragPos,TexCoords);
+    }
     // Optional gamma correction:
     result = pow(result, vec3(1.0 / 2.2));
     if (!gl_FrontFacing)

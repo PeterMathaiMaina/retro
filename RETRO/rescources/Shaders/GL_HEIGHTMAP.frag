@@ -9,5 +9,5 @@ void main() {
     // vec3 result = vec3(0.0);
     // result  = texture(terrain_texture,TexCoords).rgb * 0.2;
     // FragColor = vec4(result,1.0);
-    FragColor = vec4(vec3(0, 0.01, 0), 1.0); // basic green terrain
+    FragColor = vec4(vec3(0, 0.1, 0), 1.0); // basic green terrain
 }

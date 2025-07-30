@@ -178,8 +178,14 @@ int main() {
 
     GLuint cubeVBO, cubeVAO;
     glGenVertexArrays(1,&cubeVAO);
-    glGenVertexArrays(1,&cubeVBO);
-    
+    glGenBuffers(1,&cubeVBO);
+    glBindVertexArray(cubeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER,cubeVBO);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(cubeVertices),&cubeVertices,GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),nullptr);
+    glBindVertexArray(0);
+
 
     GLuint HDRfrb;
     glGenFramebuffers(1,&HDRfrb);
@@ -220,12 +226,12 @@ int main() {
     HeightMap heightmap("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png", 5.0);
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
     Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr);
-    Shader LightCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
     Shader HouseShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.frag", nullptr);
     Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
     Shader BunnyShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.frag", nullptr);
     Shader TreeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.frag", nullptr);
     Shader HDRShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.frag", nullptr);
+    Shader LightingCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
     BunnyShader.use();
     glm::mat4 BunnyMatrix = glm::mat4(1.0f);
     BunnyMatrix = glm::scale(BunnyMatrix, glm::vec3(0.7));
@@ -234,25 +240,8 @@ int main() {
     BunnyShader.setMat4("projection", projectionMatrix);
     BunnyShader.setvec3("aSpotlightPositon", lightPositions[10]);
     setSpotLight(BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
-    //CubeShader.use();
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, DiffuseMap);
-    //CubeShader.setInt("texture_diffuse1", 0);
-    //glActiveTexture(GL_TEXTURE1);
-    //glBindTexture(GL_TEXTURE_2D, SpecularMap);
-    //CubeShader.setInt("texture_specular1", 1);
-    //glActiveTexture(GL_TEXTURE2);
-    //glBindTexture(GL_TEXTURE_2D, NormalMap);
-    //CubeShader.setInt("texture_normal1", 2);
-    //glActiveTexture(GL_TEXTURE3);
-    //glBindTexture(GL_TEXTURE_2D, DisplacmentMap);
-    //CubeShader.setInt("texture_Displacement1", 3);
-    //CubeShader.setvec3("aSpotlightPositon", lightPositions[10]);
-    LightCubeShader.use();
-    glm::mat4 LightCubeMatrix = glm::mat4(1.0f);
-    LightCubeMatrix = glm::translate(LightCubeMatrix, lightPositions[10]);
-    LightCubeShader.setMat4("model", LightCubeMatrix);
-    LightCubeShader.setMat4("projection", projectionMatrix);
+    setPointLight(BunnyShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+
     TreeShader.use();
     glm::mat4 treeMat = glm::mat4(1.0f);
     treeMat = glm::translate(treeMat, lightPositions[0]);
@@ -263,7 +252,15 @@ int main() {
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
     HouseShader.setMat4("model", houseMat);
     HouseShader.setMat4("projection", projectionMatrix);
-    setPointLight(HouseShader, "pointlight", glm::vec3(0.5,0.5,0.5),lightPositions[0],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+
+    LightingCubeShader.use();
+    glm::mat4 Lightcubemat = glm::mat4(1.0f);
+    Lightcubemat = glm::translate(Lightcubemat,lightPositions[10]);
+    LightingCubeShader.setMat4("model",Lightcubemat);
+    LightingCubeShader.setMat4("projection",projectionMatrix);
+
+    HouseShader.use();
+    setPointLight(HouseShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
 
     // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
@@ -272,6 +269,7 @@ int main() {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
+        // std::cout << "X "<<camera.Position.x <<"Y "<<camera.Position.y <<"Z "<<camera.Position.z <<std::endl; 
         
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -285,10 +283,12 @@ int main() {
         BunnyShader.setMat4("view", camera.GetViewMatrix());
         BunnyShader.setvec3("viewPos", cameraPtr->Position);
         CubeShader.setvec3("viewPos", cameraPtr->Position);
-        LightCubeShader.setMat4("view", cameraPtr->GetViewMatrix());
         HouseShader.use();
         HouseShader.setMat4("view", cameraPtr->GetViewMatrix());
         HouseShader.setvec3("viewpos", cameraPtr->Position);
+        LightingCubeShader.use();
+        LightingCubeShader.setMat4("view",cameraPtr->GetViewMatrix());
+
 
         glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -296,12 +296,13 @@ int main() {
         Tree.Draw(TreeShader);
         Bunny.Draw(BunnyShader);
 
+        LightingCubeShader.use();
+        glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES,0,36);
+        glBindVertexArray(0);
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        HeightMapShader.use();
-        glActiveTexture(GL_TEXTURE0);  
-        glBindTexture(GL_TEXTURE_2D, HeightmapTexture);
-        HeightMapShader.setInt("terrain_texture", 0);
         heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
 
 
@@ -316,7 +317,8 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
         HDRShader.setInt("hdrBuffer", 0);
-        HDRShader.setFloat("exposure", 0.7515f);  
+        HDRShader.setFloat("exposure", 0.3f);  
+
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);

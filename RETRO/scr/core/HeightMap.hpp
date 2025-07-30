@@ -36,7 +36,7 @@ struct HeightMap {
 
         for (int z = 0; z < height; z += step) {
             for (int x = 0; x < width; x += step) {
-                float y = data[z * width + x] / 255.0f * maxHeight -0.5;
+                float y = data[z * width + x] / 255.0f * maxHeight -0.3;
 
                 
                 vertices.push_back((float)x);

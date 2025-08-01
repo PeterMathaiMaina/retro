@@ -1,5 +1,4 @@
 #version 450
-
 out vec4 FragColor;
 
 in vec2 TexCoords;
@@ -99,19 +98,17 @@ vec3 calcspotlight(Spotlight light, vec3 viewDir, vec3 norm, vec3 fragPos, vec2 
     return (ambient + diffuse + specular);
 }
 
-void main()
-{
+void main() {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewpos - fragPos);
+    vec3 texDiffuse = texture(texture_diffuse1, TexCoords).rgb;
+    vec3 texSpecular = texture(texture_specular1, TexCoords).rgb;
     vec3 result = CalcPointLight(pointlight, norm, fragPos, viewDir);
-    if (spotlight.enabled)
-    {
-        result += calcspotlight(spotlight,viewDir,norm,fragPos,TexCoords);
+    if (spotlight.enabled) {
+        result += calcspotlight(spotlight, viewDir, norm, fragPos,TexCoords);//vec3 calcspotlight(Spotlight light, vec3 viewDir, vec3 norm, vec3 fragPos, vec2 TexCoords)
     }
-    // Optional gamma correction:
     result = pow(result, vec3(1.0 / 2.2));
     if (!gl_FrontFacing)
         discard;
-    else
-        FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, 1.0);
 }

@@ -10,7 +10,6 @@
 #include "../../third_party/glm/glm.hpp"
 #include "../../third_party/glm/gtc/matrix_transform.hpp"
 #include "../../third_party/glm/gtc/type_ptr.hpp"
-
 struct Shader
 {
     unsigned int ID; // Shader program ID
@@ -27,6 +26,7 @@ struct Shader
     void setFloat(const std::string &name, float value) const;
     void setMat4(const std::string &name, const glm::mat4 &value) const;
     void setvec3(const std::string &name, const glm::vec3 &value) const;
+    int GetShaderID();
 
 private:
     // Utility function to check shader compilation/linking errors

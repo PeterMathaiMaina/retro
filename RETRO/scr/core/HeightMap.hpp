@@ -7,6 +7,7 @@
 #include <iostream>
 #include "../../third_party/imageprocessing/stb_image.h"
 #include "../Shader/ShaderSetup.h"
+#include "GlobalDef.h"
 
 struct HeightMap {
     int width, height;

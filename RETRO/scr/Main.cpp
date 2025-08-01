@@ -19,12 +19,14 @@
 #include "../textureLoader/textureLoader.hpp"
 #include "graphics/Model.hpp"
 #include "core/CleanUp.h"
+#include "core/shaderManager.hpp"
+#include "core/GlobalDef.h"
 #include "assetManager/GlobalDeclarations.h"
 #include "Headers/Callbacks.h"
 #include <bitset>
 #include "Shader/ShaderSetup.h"
 
-const unsigned int WINDOW_WIDTH = 1800, WINDOW_HEIGHT = 1000;
+const unsigned int WINDOW_WIDTH = 1600, WINDOW_HEIGHT = 1000;
 const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
 float aspect = static_cast<float>(WINDOW_WIDTH) / WINDOW_HEIGHT;
 float shd_aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
@@ -49,7 +51,7 @@ glm::vec3 lightPositions[] = {
     glm::vec3(20.40188f, 0.0f, 0.0f), glm::vec3(48.2f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f),
     glm::vec3(1.0f, 5.0f, 0.0f), glm::vec3(-2.0f, -1.0f, 0.0f), glm::vec3(3.0f, 0.5f, 0.0f),
     glm::vec3(-1.5f, 2.5f, 0.0f), glm::vec3(0.5f, -2.0f, -1.0f), glm::vec3(-20.0f, 9.0f, 0.5f),
-    glm::vec3(-3.0f, 9.5f, -2.0f), glm::vec3(2.0f, 3.0f, 4.0f), glm::vec3(-0.5f, 1.5f, -3.0f),
+    glm::vec3(-3.0f, 9.5f, -2.0f), glm::vec3(67.8f, 83.0f, 47.0f), glm::vec3(-0.5f, 1.5f, -3.0f),
     glm::vec3(1.5f, -1.0f, 2.0f), glm::vec3(-2.5f, 0.0f, -1.5f), glm::vec3(0.0f, -3.0f, 1.0f),
     glm::vec3(3.5f, 2.0f, -0.5f), glm::vec3(-1.0f, -2.5f, 0.0f), glm::vec3(2.5f, 0.8f, 3.0f),
     glm::vec3(-3.5f, 1.2f, -1.0f)
@@ -135,7 +137,7 @@ float cubeVertices[] = {
     -0.5f, -0.5f,  0.5f,  
     -0.5f, -0.5f, -0.5f  
 };
-
+void RenderShadowScene(GLuint* ShadowScenefrb,Shader* DepthShader);
 
 
 int main() {
@@ -154,6 +156,10 @@ int main() {
         std::cerr << "GLEW initialization failed!" << std::endl;
         return -1;
     }
+
+    GlobalDef::GlobalInit();
+
+
     float quadVertices[] = {
         -1.0f,  1.0f,   0.0f, 1.0f,
         -1.0f, -1.0f,   0.0f, 0.0f,
@@ -208,6 +214,24 @@ int main() {
         std::cerr << "HDR FRAMEBUFFER FAILED TO COMPLETE" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
 
+    GLuint ShadowMappingfrb;
+    glGenFramebuffers(1,&ShadowMappingfrb);
+    glBindFramebuffer(GL_FRAMEBUFFER,ShadowMappingfrb);
+    GLuint shadowTexture;
+    glGenTextures(1,&shadowTexture);
+    glBindTexture(GL_TEXTURE_2D,shadowTexture);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,SHADOW_WIDTH,SHADOW_HEIGHT,0,GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_NEAREST);
+
+    glFramebufferTexture(GL_FRAMEBUFFER,GL_DEPTH_COMPONENT,GL_TEXTURE_2D,shadowTexture);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "SHADOW FRAMEBUFFER NOT COMPLETE" <<std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+
     GLuint HeightmapTexture = LoadHeightMapTexture("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png");
 
     Camera* cameraPtr = &camera;
@@ -225,42 +249,35 @@ int main() {
     //GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
     HeightMap heightmap("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png", 5.0);
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
-    Shader CubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr);
-    Shader HouseShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HOUSE_SHADER.frag", nullptr);
-    Shader HeightMapShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr);
-    Shader BunnyShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.frag", nullptr);
-    Shader TreeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.frag", nullptr);
-    Shader HDRShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HDR.frag", nullptr);
-    Shader LightingCubeShader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_LIGHTING_CUBES.frag", nullptr);
-    BunnyShader.use();
+    BunnyShader->use();
     glm::mat4 BunnyMatrix = glm::mat4(1.0f);
     BunnyMatrix = glm::scale(BunnyMatrix, glm::vec3(0.7));
     BunnyMatrix = glm::translate(BunnyMatrix, glm::vec3(10.0f, 0.0f, 0.0f));
-    BunnyShader.setMat4("model", BunnyMatrix);
-    BunnyShader.setMat4("projection", projectionMatrix);
-    BunnyShader.setvec3("aSpotlightPositon", lightPositions[10]);
-    setSpotLight(BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
-    setPointLight(BunnyShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    BunnyShader->setMat4("model", BunnyMatrix);
+    BunnyShader->setMat4("projection", projectionMatrix);
+    BunnyShader->setvec3("aSpotlightPositon", lightPositions[10]);
+    setSpotLight(*BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
+    setPointLight(*BunnyShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
 
-    TreeShader.use();
+    TreeShader->use();
     glm::mat4 treeMat = glm::mat4(1.0f);
     treeMat = glm::translate(treeMat, lightPositions[0]);
-    TreeShader.setMat4("model", treeMat);
-    HouseShader.use();
+    TreeShader->setMat4("model", treeMat);
+    HouseShader->use();
     glm::mat4 houseMat = glm::mat4(1.0f);
     houseMat = glm::translate(houseMat, glm::vec3(48.2f, -4.40f, 0.0f));
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
-    HouseShader.setMat4("model", houseMat);
-    HouseShader.setMat4("projection", projectionMatrix);
+    HouseShader->setMat4("model", houseMat);
+    HouseShader->setMat4("projection", projectionMatrix);
 
-    LightingCubeShader.use();
+    LightingCubeShader->use();
     glm::mat4 Lightcubemat = glm::mat4(1.0f);
     Lightcubemat = glm::translate(Lightcubemat,lightPositions[10]);
-    LightingCubeShader.setMat4("model",Lightcubemat);
-    LightingCubeShader.setMat4("projection",projectionMatrix);
+    LightingCubeShader->setMat4("model",Lightcubemat);
+    LightingCubeShader->setMat4("projection",projectionMatrix);
 
-    HouseShader.use();
-    setPointLight(HouseShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    HouseShader->use();
+    setPointLight(*HouseShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
 
     // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
@@ -276,34 +293,34 @@ int main() {
         glDepthMask(GL_TRUE);
         glEnable(GL_MULTISAMPLE);
         input.processInput(window, deltaTime, camera, FlashLight::flashlightTogglePressed, FlashLight::flashlightOn);
-        TreeShader.use();
-        TreeShader.setMat4("projection", projectionMatrix);
-        TreeShader.setMat4("view", cameraPtr->GetViewMatrix());
-        BunnyShader.use();
-        BunnyShader.setMat4("view", camera.GetViewMatrix());
-        BunnyShader.setvec3("viewPos", cameraPtr->Position);
-        CubeShader.setvec3("viewPos", cameraPtr->Position);
-        HouseShader.use();
-        HouseShader.setMat4("view", cameraPtr->GetViewMatrix());
-        HouseShader.setvec3("viewpos", cameraPtr->Position);
-        LightingCubeShader.use();
-        LightingCubeShader.setMat4("view",cameraPtr->GetViewMatrix());
+        TreeShader->use();
+        TreeShader->setMat4("projection", projectionMatrix);
+        TreeShader->setMat4("view", cameraPtr->GetViewMatrix());
+        BunnyShader->use();
+        BunnyShader->setMat4("view", camera.GetViewMatrix());
+        BunnyShader->setvec3("viewPos", cameraPtr->Position);
+        CubeShader->setvec3("viewPos", cameraPtr->Position);
+        HouseShader->use();
+        HouseShader->setMat4("view", cameraPtr->GetViewMatrix());
+        HouseShader->setvec3("viewpos", cameraPtr->Position);
+        LightingCubeShader->use();
+        LightingCubeShader->setMat4("view",cameraPtr->GetViewMatrix());
 
 
         glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        House.Draw(HouseShader);
-        Tree.Draw(TreeShader);
-        Bunny.Draw(BunnyShader);
+        House.Draw(*HouseShader);
+        Tree.Draw(*TreeShader);
+        Bunny.Draw(*BunnyShader);
 
-        LightingCubeShader.use();
+        LightingCubeShader->use();
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        heightmap.Draw(HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
+        heightmap.Draw(*HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
 
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -313,11 +330,11 @@ int main() {
 
         // Disable depth testing for quad
         glDisable(GL_DEPTH_TEST);
-        HDRShader.use();
+        HDRShader->use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
-        HDRShader.setInt("hdrBuffer", 0);
-        HDRShader.setFloat("exposure", 0.3f);  
+        HDRShader->setInt("hdrBuffer", 0);
+        HDRShader->setFloat("exposure", 0.3f);  
 
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -337,3 +354,10 @@ int main() {
     glfwTerminate();
     return 0;
 }
+
+void RenderShadowScene(auto& ShadowScenefrb,Shader& DepthShader){
+    glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER,ShadowScenefrb);
+
+
+};

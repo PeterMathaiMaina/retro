@@ -22,11 +22,14 @@ find_package(OpenGL REQUIRED)
 find_package(assimp REQUIRED)
 
 add_executable(RETRO2025
+    scr/core/GlobalDef.cpp
     scr/Main.cpp
     scr/Renderer/Renderer.cpp
     scr/assetManager/GlobalDeclarations.cpp
     scr/assetManager/InputState.h
     scr/core/Shader.cpp
+    scr/core/ShaderManager.hpp
+    scr/core/ShaderManager.cpp
     third_party/imageprocessing/stb_image.cpp
     scr/Input/Input.cpp
     scr/Headers/callbacks.cpp

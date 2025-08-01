@@ -136,3 +136,6 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type)
         }
     }
 }
+int Shader::GetShaderID(){
+    return ID;
+}

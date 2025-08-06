@@ -4,7 +4,6 @@
 #include <chrono>
 #include <thread>
 #include <vector>
-#include <windows.h>
 #include <map>
 #include "core/Shader.hpp"
 #include "core/HeightMap.hpp"
@@ -19,7 +18,7 @@
 #include "../textureLoader/textureLoader.hpp"
 #include "graphics/Model.hpp"
 #include "core/CleanUp.h"
-#include "core/shaderManager.hpp"
+#include "core/ShaderManager.hpp"
 #include "core/GlobalDef.h"
 #include "assetManager/GlobalDeclarations.h"
 #include "Headers/Callbacks.h"

@@ -4,8 +4,10 @@ project(RETRO2025)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-# Set Assimp install folder here (make sure this is where assimpConfig.cmake is)
-set(CMAKE_PREFIX_PATH "C:/msys64/mingw64" ${CMAKE_PREFIX_PATH})
+# Optional: disable Wayland for GLFW if needed
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
+
 # GLFW via FetchContent
 include(FetchContent)
 FetchContent_Declare(
@@ -15,10 +17,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-add_definitions(-DGLEW_STATIC)
-
-# Find required packages
+# GLEW and Assimp
 find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 find_package(assimp REQUIRED)
 
 add_executable(RETRO2025
@@ -35,8 +36,8 @@ add_executable(RETRO2025
     scr/Headers/callbacks.cpp
     textureLoader/textureLoader.cpp
     scr/Shader/ShaderSetup.cpp
-
 )
+
 
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
@@ -57,8 +58,8 @@ target_include_directories(RETRO2025 PRIVATE
 )
 
 target_link_libraries(RETRO2025
-    ${CMAKE_SOURCE_DIR}/Libs/glew-2.1.0/lib/Release/x64/glew32s.lib
     glfw
     OpenGL::GL
+    GLEW::GLEW
     assimp::assimp
 )

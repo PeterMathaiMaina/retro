@@ -1,9 +1,9 @@
 #include "ShaderManager.hpp"
 #include <iostream>
 std::map<std::string, Shader> ShaderManager::Shaders;
-
+///home/peter/retro/RETRO/rescources/Shaders/GL_CUBE.vert
 void ShaderManager::InitShaders() {
-    Shaders.emplace("m_Cube" , Shader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_CUBE.frag", nullptr));
+    Shaders.emplace("m_Cube" , Shader("home/peter/retro/RETRO/rescources/Shaders/GL_CUBE.vert", "home/peter/retro\\RETRO/rescources/Shaders/GL_CUBE.frag", nullptr));
     Shaders.emplace("m_Tree" , Shader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_TREES.frag", nullptr));
     Shaders.emplace("m_Bunny", Shader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_BUNNY.frag", nullptr));
     Shaders.emplace("m_HeightMap",Shader("C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.vert", "C:\\Users\\user\\retro\\RETRO\\rescources\\Shaders\\GL_HEIGHTMAP.frag", nullptr));

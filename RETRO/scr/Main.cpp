@@ -139,7 +139,18 @@ float cubeVertices[] = {
 void RenderShadowScene(GLuint* ShadowScenefrb,Shader* DepthShader);
 
 
+void PrintGLInfo() {
+    const GLubyte* renderer = glGetString(GL_RENDERER);   // e.g., "NVIDIA GeForce GTX 1650"
+    const GLubyte* version  = glGetString(GL_VERSION);    // e.g., "4.6.0 NVIDIA 535.104.05"
+    const GLubyte* vendor   = glGetString(GL_VENDOR);     // e.g., "NVIDIA Corporation"
+
+    std::cout << "GL Vendor  : " << vendor << std::endl;
+    std::cout << "GL Renderer: " << renderer << std::endl;
+    std::cout << "GL Version : " << version << std::endl;
+};
+
 int main() {
+    HeightMap heightmap("/home/peter/retro/RETRO/rescources/textures/Uncompressed/HEIGHTMAP.png", 5.0);
     if (!glfwInit()) return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -155,8 +166,12 @@ int main() {
         std::cerr << "GLEW initialization failed!" << std::endl;
         return -1;
     }
-
+    
+    PrintGLInfo();
+    // std::cout << camera.Front.x <<std::endl;
     GlobalDef::GlobalInit();
+    heightmap.uploadToGPU();
+
 
 
     float quadVertices[] = {
@@ -231,60 +246,57 @@ int main() {
         std::cerr << "SHADOW FRAMEBUFFER NOT COMPLETE" <<std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-    GLuint HeightmapTexture = LoadHeightMapTexture("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png");
+    // GLuint HeightmapTexture = LoadHeightMapTexture("home/peter/retro/RETRO/rescources/textures/Uncompressed/HEIGHTMAP.png");
 
     Camera* cameraPtr = &camera;
     setupcallbacks(window, cameraPtr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwWindowHint(GLFW_SAMPLES, 4);
-    Model Bunny("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\bunny\\scene.gltf");
-    Model House("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\House1\\House.obj");
-    Model Tree("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\tree\\TreeLarge_0.obj");
+    // Model Bunny("/home/peter/retro/RETRO/rescources/models_raw/bunny/scene.gltf");
+    // Model House("/home/peter/retro/RETRO/rescources/models_raw/House1/House.obj");
+    // Model Tree( "/home/peter/retro/RETRO/rescources/models_raw/tree/TreeLarge_0.obj");
     // Model CharacterModel("C:\\Users\\user\\retro\\RETRO\\rescources\\models_raw\\CharacterModel\\Man_test_4.obj");
 
-    //GLint SpecularMap = TextureFromFile("Specular.jpe", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    //GLint DiffuseMap = TextureFromFile("bricks2.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    //GLint NormalMap = TextureFromFile("bricks2_normal.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    //GLint DisplacmentMap = TextureFromFile("bricks2_disp.jpg", "C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed");
-    HeightMap heightmap("C:\\Users\\user\\retro\\RETRO\\rescources\\textures\\Uncompressed\\HEIGHTMAP.png", 5.0);
     glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
-    BunnyShader->use();
+    // globals::BunnyShader->use();
+    globals::BunnyShader->use();
     glm::mat4 BunnyMatrix = glm::mat4(1.0f);
     BunnyMatrix = glm::scale(BunnyMatrix, glm::vec3(0.7));
     BunnyMatrix = glm::translate(BunnyMatrix, glm::vec3(10.0f, 0.0f, 0.0f));
-    BunnyShader->setMat4("model", BunnyMatrix);
-    BunnyShader->setMat4("projection", projectionMatrix);
-    BunnyShader->setvec3("aSpotlightPositon", lightPositions[10]);
-    setSpotLight(*BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
-    setPointLight(*BunnyShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    globals::BunnyShader->setMat4("model", BunnyMatrix);
+    globals::BunnyShader->setMat4("projection", projectionMatrix);
+    globals::BunnyShader->setvec3("aSpotlightPositon", lightPositions[10]);
+    setSpotLight(*globals::BunnyShader, "spotlight", lightPositions[10], glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
+    setPointLight(*globals::BunnyShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
 
-    TreeShader->use();
+    globals::TreeShader->use();
     glm::mat4 treeMat = glm::mat4(1.0f);
     treeMat = glm::translate(treeMat, lightPositions[0]);
-    TreeShader->setMat4("model", treeMat);
-    HouseShader->use();
+    globals::TreeShader->setMat4("model", treeMat);
+    globals::HouseShader->use();
     glm::mat4 houseMat = glm::mat4(1.0f);
     houseMat = glm::translate(houseMat, glm::vec3(48.2f, -4.40f, 0.0f));
     houseMat = glm::scale(houseMat, glm::vec3(1.3f));
-    HouseShader->setMat4("model", houseMat);
-    HouseShader->setMat4("projection", projectionMatrix);
+    globals::HouseShader->setMat4("model", houseMat);
+    globals::HouseShader->setMat4("projection", projectionMatrix);
 
-    LightingCubeShader->use();
+    globals::LightingCubeShader->use();
     glm::mat4 Lightcubemat = glm::mat4(1.0f);
     Lightcubemat = glm::translate(Lightcubemat,lightPositions[10]);
-    LightingCubeShader->setMat4("model",Lightcubemat);
-    LightingCubeShader->setMat4("projection",projectionMatrix);
+    globals::LightingCubeShader->setMat4("model",Lightcubemat);
+    globals::LightingCubeShader->setMat4("projection",projectionMatrix);
 
-    HouseShader->use();
-    setPointLight(*HouseShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
+    globals::HouseShader->use();
+    setPointLight(*globals::HouseShader, "pointlight", glm::vec3(0,0,0),lightPositions[10],glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f);
 
-    // setSpotLight(HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
+    // setSpotLight(globals::HouseShader, "spotlight",camera.Position,camera.Front, glm::vec3(2.7f), glm::vec3(0.8f), glm::vec3(0.01f), 1.0f, 0.02f, 0.004f, glm::cos(glm::radians(10.5f)), glm::cos(glm::radians(12.5f)), FlashLight::flashlightOn);
     Input input;
     glViewport(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);
     while (!glfwWindowShouldClose(window)) {
         auto startTime = hr_clock::now();
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
+        // std::cout << 1/deltaTime <<std::endl;
         // std::cout << "X "<<camera.Position.x <<"Y "<<camera.Position.y <<"Z "<<camera.Position.z <<std::endl; 
         
         glEnable(GL_DEPTH_TEST);
@@ -292,34 +304,34 @@ int main() {
         glDepthMask(GL_TRUE);
         glEnable(GL_MULTISAMPLE);
         input.processInput(window, deltaTime, camera, FlashLight::flashlightTogglePressed, FlashLight::flashlightOn);
-        TreeShader->use();
-        TreeShader->setMat4("projection", projectionMatrix);
-        TreeShader->setMat4("view", cameraPtr->GetViewMatrix());
-        BunnyShader->use();
-        BunnyShader->setMat4("view", camera.GetViewMatrix());
-        BunnyShader->setvec3("viewPos", cameraPtr->Position);
-        CubeShader->setvec3("viewPos", cameraPtr->Position);
-        HouseShader->use();
-        HouseShader->setMat4("view", cameraPtr->GetViewMatrix());
-        HouseShader->setvec3("viewpos", cameraPtr->Position);
-        LightingCubeShader->use();
-        LightingCubeShader->setMat4("view",cameraPtr->GetViewMatrix());
+        globals::TreeShader->use();
+        globals::TreeShader->setMat4("projection", projectionMatrix);
+        globals::TreeShader->setMat4("view", cameraPtr->GetViewMatrix());
+        globals::BunnyShader->use();
+        globals::BunnyShader->setMat4("view", camera.GetViewMatrix());
+        globals::BunnyShader->setvec3("viewPos", cameraPtr->Position);
+        globals::CubeShader->setvec3("viewPos", cameraPtr->Position);
+        globals::HouseShader->use();
+        globals::HouseShader->setMat4("view", cameraPtr->GetViewMatrix());
+        globals::HouseShader->setvec3("viewpos", cameraPtr->Position);
+        globals::LightingCubeShader->use();
+        globals::LightingCubeShader->setMat4("view",cameraPtr->GetViewMatrix());
 
 
         glBindFramebuffer(GL_FRAMEBUFFER,HDRfrb);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        House.Draw(*HouseShader);
-        Tree.Draw(*TreeShader);
-        Bunny.Draw(*BunnyShader);
+        globals::HouseModel->Draw(*globals::HouseShader);
+        globals::TreeModel->Draw(*globals::TreeShader);
+        globals::BunnyModel->Draw(*globals::BunnyShader);
 
-        LightingCubeShader->use();
+        globals::LightingCubeShader->use();
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES,0,36);
         glBindVertexArray(0);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        heightmap.Draw(*HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
+        heightmap.Draw(*globals::HeightMapShader, glm::mat4(1.0f), camera.GetViewMatrix(), projectionMatrix);
 
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -329,11 +341,11 @@ int main() {
 
         // Disable depth testing for quad
         glDisable(GL_DEPTH_TEST);
-        HDRShader->use();
+        globals::HDRShader->use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, HDRtexture);
-        HDRShader->setInt("hdrBuffer", 0);
-        HDRShader->setFloat("exposure", 0.3f);  
+        globals::HDRShader->setInt("hdrBuffer", 0);
+        globals::HDRShader->setFloat("exposure", 2.0f);  
 
         glBindVertexArray(quadVAO); 
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -354,9 +366,3 @@ int main() {
     return 0;
 }
 
-void RenderShadowScene(auto& ShadowScenefrb,Shader& DepthShader){
-    glViewport(0,0,SHADOW_WIDTH,SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER,ShadowScenefrb);
-
-
-};

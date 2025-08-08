@@ -1,8 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
+
+
+# Optional: Force Clang (better to set env variables instead)
+set(CMAKE_C_COMPILER "clang")
+set(CMAKE_CXX_COMPILER "clang++")
+
+# Enable ccache if found
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+endif()
+
 project(RETRO2025)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
+
 
 # Optional: disable Wayland for GLFW if needed
 set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
@@ -24,6 +39,7 @@ find_package(assimp REQUIRED)
 
 add_executable(RETRO2025
     scr/core/GlobalDef.cpp
+    scr/AssetManager/AssetManager.cpp
     scr/Main.cpp
     scr/Renderer/Renderer.cpp
     scr/assetManager/GlobalDeclarations.cpp
@@ -41,7 +57,7 @@ add_executable(RETRO2025
 
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
-    ${CMAKE_SOURCE_DIR}/scr/assetManager
+    ${CMAKE_SOURCE_DIR}/scr/AssetManager
     ${CMAKE_SOURCE_DIR}/scr/Renderer
     ${CMAKE_SOURCE_DIR}/scr/Shader
     ${CMAKE_SOURCE_DIR}/scr/core

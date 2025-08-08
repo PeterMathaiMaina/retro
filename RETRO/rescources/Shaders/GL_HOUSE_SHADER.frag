@@ -1,4 +1,4 @@
-#version 450
+#version 460
 out vec4 FragColor;
 
 in vec2 TexCoords;
@@ -99,6 +99,8 @@ vec3 calcspotlight(Spotlight light, vec3 viewDir, vec3 norm, vec3 fragPos, vec2 
 }
 
 void main() {
+    if (!gl_FrontFacing)
+        discard;
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewpos - fragPos);
     vec3 texDiffuse = texture(texture_diffuse1, TexCoords).rgb;
@@ -108,7 +110,6 @@ void main() {
         result += calcspotlight(spotlight, viewDir, norm, fragPos,TexCoords);//vec3 calcspotlight(Spotlight light, vec3 viewDir, vec3 norm, vec3 fragPos, vec2 TexCoords)
     }
     result = pow(result, vec3(1.0 / 2.2));
-    if (!gl_FrontFacing)
-        discard;
+
     FragColor = vec4(result, 1.0);
 }

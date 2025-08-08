@@ -10,8 +10,8 @@ Pl 1
 Ka 1 1 1
 Kd 1 1 1
 Ke 0 0 0
-#map_Kd ..\textures\TreeLarge_0_ALB.dds
-map_Kd ..\textures\bark.dds
+#map_Kd textures/TreeLarge_0_ALB.dds
+map_Kd textures/bark.dds
 
 newmtl Eucalyptus_Bark_3_Mat.004
 Tr 0.0000
@@ -23,5 +23,5 @@ Pl 1
 Ka 1 1 1
 Kd 1 1 1
 Ke 0 0 0
-#map_Kd ..\textures\TreeLarge_0_ALB.dds
-map_Kd ..\textures\bark.dds
+#map_Kd textures/TreeLarge_0_ALB.dds
+map_Kd textures/bark.dds

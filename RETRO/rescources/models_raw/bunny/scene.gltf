@@ -167,13 +167,13 @@
   ],
   "images": [
     {
-      "uri": "../textures/Default_Material1_baseColor.dds"
+      "uri": "textures/Default_Material1_baseColor.dds"
     },
     {
-      "uri": "../textures/Default_Material1_metallicRoughness.dds"
+      "uri": "textures/Default_Material1_metallicRoughness.dds"
     },
     {
-      "uri": "../textures/Default_Material1_normal.dds"
+      "uri": "textures/Default_Material1_normal.dds"
     }
   ],
   "materials": [

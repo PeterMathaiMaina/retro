@@ -9,7 +9,7 @@
 class ShaderManager
 {
 public:
-    static void InitShaders();
+    static void Init();
     static Shader& Getshaderbyname(const std::string& name); 
 private:
     static std::map<std::string,Shader>Shaders;

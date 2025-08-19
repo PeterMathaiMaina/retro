@@ -17,6 +17,7 @@ namespace globals {
     extern Model* TreeModel;
 }
 
+
 class GlobalDef {
 public:
     static void GlobalInit();

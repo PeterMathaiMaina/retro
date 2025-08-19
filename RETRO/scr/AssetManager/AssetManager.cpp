@@ -1,44 +1,66 @@
 #include "AssetManager.h"
-
-
+std::vector<AssetJob> AssetManager::AssetsToLoad;
+std::map<std::string,GLuint> AssetManager::GPUTextureIDs;
 std::map<std::string,Model> AssetManager::Models;
-std::map<std::string,unsigned int> AssetManager::Textures;
+size_t AssetManager::CurrentAssetIndex = 0;
 
-Model& AssetManager::GetModelByName(const std::string& name) {
-    if(Models.count(name)>0)
-        return Models.find(name)->second;
-    auto it = Models.find(name);
-    if (it != Models.end()) {
+void AssetManager::Init(){
+    AssetManager::QueueAssets();
+}
+
+void AssetManager::QueueAssets() {
+    AssetsToLoad = {
+        {AssetType::Texture, "BrickTex", "/home/peter/retro/RETRO/rescources/textures/Uncompressed/HEIGHTMAP.png"},
+        // {AssetType::Texture, "GrassTex", "textures/grass.png"},
+        // {AssetType::Model,   "TreeModel", "models/tree.obj"},
+        // {AssetType::Shader,  "DefaultShader", "shaders/default.vert"},
+    };
+    CurrentAssetIndex = 0;
+}
+unsigned int AssetManager::GetTextureIDbyname(const std::string& name){
+
+    auto it = GPUTextureIDs.find(name);
+    if (it !=GPUTextureIDs.end()){
         return it->second;
-    } else {
-        std::cerr << "[AssetManager] Error: Model '" << name << "' not found!" << std::endl;
-        throw std::runtime_error("Model not found");
     }
+    std::cerr << "[ASSETMANAGER] could not find the texture"<<std::endl;
+    return 0;
 }
 
-unsigned int AssetManager::GetTextureByName(const std::string& name) {
-    auto it = Textures.find(name);
-    if (it != Textures.end()) {
-        return it->second;
-    } else {
-        std::cerr << "[AssetManager] Error: Texture '" << name << "' not found!" << std::endl;
-        throw std::runtime_error("Texture not found");
+
+void AssetManager::UpdateLoading() {
+    if (CurrentAssetIndex >= AssetsToLoad.size()) return;
+    std::cout<<"loading"<<std::endl;
+    std::cout<<"loading"<<std::endl;
+    std::cout<<"loading"<<std::endl;
+    // std::cout<<AssetsToLoad.size()<<std::endl;
+
+    const AssetJob& job = AssetsToLoad[CurrentAssetIndex];
+
+    switch (job.type) {
+        case AssetType::Texture: {
+            unsigned int TextureID = TextureFromFile(job.path); // stb_image wrapper
+            GPUTextureIDs[job.name] = TextureID;
+            break;
+        }
+        case AssetType::Model: {
+            Model model(job.path);
+            Models[job.name] = model;
+            break;
+        }
+        case AssetType::Shader:{
+            break;
+        }
     }
+    CurrentAssetIndex++;
 }
 
-void AssetManager::Init() {
-    std::cout << "[AssetManager] Initializing assets..." << std::endl;
 
-    // Load Textures
-    Textures["Specular"] = TextureFromFile("Specular.jpe","/home/peter/retro/RETRO/rescources/textures/Uncompressed");
-    Textures["bricks"] =  TextureFromFile("bricks2.jpg","/home/peter/retro/RETRO/rescources/textures/Uncompressed");
-    Textures["bricksNRM"] =   TextureFromFile("bricks2_normal.jpg", "/home/peter/retro/RETRO/rescources/textures/Uncompressed");
-
-    // Load Models
-    Models.emplace("bunny", Model("/home/peter/retro/RETRO/rescources/models_raw/bunny/scene.gltf"));
-    Models.emplace("house", Model("/home/peter/retro/RETRO/rescources/models_raw/House1/House.obj"));
-    Models.emplace("tree",  Model("/home/peter/retro/RETRO/rescources/models_raw/tree/TreeLarge_0.obj"));
-
-    std::cout << "[AssetManager] Assets loaded successfully." << std::endl;
+bool AssetManager::LoadingComplete() {
+    return CurrentAssetIndex >= AssetsToLoad.size();
 }
 
+float AssetManager::GetProgress() {
+    if (AssetsToLoad.empty()) return 1.0f;
+    return (float)CurrentAssetIndex / (float)AssetsToLoad.size();
+}

@@ -40,10 +40,11 @@ find_package(assimp REQUIRED)
 add_executable(RETRO2025
     scr/core/GlobalDef.cpp
     scr/AssetManager/AssetManager.cpp
+    scr/GlobalAssets/GlobalAssets.cpp
+    scr/BackEnd/BackEnd.cpp
     scr/Main.cpp
+    scr/Game/Game.cpp
     scr/Renderer/Renderer.cpp
-    scr/assetManager/GlobalDeclarations.cpp
-    scr/assetManager/InputState.h
     scr/core/Shader.cpp
     scr/core/ShaderManager.hpp
     scr/core/ShaderManager.cpp
@@ -57,7 +58,11 @@ add_executable(RETRO2025
 
 target_include_directories(RETRO2025 PRIVATE
     ${CMAKE_SOURCE_DIR}/scr
+    ${CMAKE_SOURCE_DIR}/scr/Types
+    ${CMAKE_SOURCE_DIR}/scr/BackEnd
+    ${CMAKE_SOURCE_DIR}/scr/Game
     ${CMAKE_SOURCE_DIR}/scr/AssetManager
+    ${CMAKE_SOURCE_DIR}/scr/GlobalAssets/
     ${CMAKE_SOURCE_DIR}/scr/Renderer
     ${CMAKE_SOURCE_DIR}/scr/Shader
     ${CMAKE_SOURCE_DIR}/scr/core

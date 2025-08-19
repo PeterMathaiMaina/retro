@@ -9,15 +9,15 @@
 #include "textureLoader.hpp"
 
 
-unsigned int TextureFromFile(const char* path, const std::string& directory)
+unsigned int TextureFromFile(const std::string& fullPath)
 {
-    std::filesystem::path texPath(path);
-    std::string fullPath = texPath.is_absolute() 
-        ? texPath.generic_string() 
-        : (std::filesystem::path(directory) / texPath).generic_string();
+    // Ensure it's an absolute path
+    std::filesystem::path texPath(fullPath);
+    if (!texPath.is_absolute()) {
+        throw std::runtime_error("TextureFromFile requires an absolute path: " + fullPath);
+    }
 
-    std::cout << fullPath << std::endl;
-
+    std::cout << "[Loading Texture] " << texPath.generic_string() << std::endl;
 
     std::string ext = texPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -34,6 +34,22 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
         return LoadTextureWithSTB(fullPath);
     }
 }
+// CPUTexture LoadtextureinCPU(const std::string& path) {
+//     CPUTexture tex;
+//     tex.width = 0;
+//     tex.height = 0;
+//     tex.channels = 0;
+
+//     unsigned char* data = stbi_load(path.c_str(), &tex.width, &tex.height, &tex.channels, 0);
+//     if (!data) {
+//         throw std::runtime_error("Failed to load image: " + path);
+//     }
+
+//     tex.pixels.assign(data, data + tex.width * tex.height * tex.channels);
+//     stbi_image_free(data);
+//     return tex;
+// }
+
 
 unsigned int LoadTextureWithSTB(const std::string& fullPath)
 {

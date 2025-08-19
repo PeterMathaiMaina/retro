@@ -10,6 +10,7 @@ void ShaderManager::Init() {
     Shaders.emplace("m_LightingCube",Shader("/home/peter/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.vert", "/home/peter/retro/RETRO/rescources/Shaders/GL_LIGHTING_CUBES.frag", nullptr));
     Shaders.emplace("m_House",Shader("/home/peter/retro/RETRO/rescources/Shaders/GL_HOUSE_SHADER.vert", "/home/peter/retro/RETRO/rescources/Shaders/GL_HOUSE_SHADER.frag", nullptr));
     Shaders.emplace("m_HDR",Shader("/home/peter/retro/RETRO/rescources/Shaders/GL_HDR.vert", "/home/peter/retro/RETRO/rescources/Shaders/GL_HDR.frag", nullptr));
+    std::cout << "SHADER INITIALISED" <<std::endl;
 }
 
 Shader& ShaderManager::Getshaderbyname(const std::string& name)

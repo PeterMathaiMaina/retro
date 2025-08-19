@@ -23,6 +23,7 @@ public:
     bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
+    Model() = default;
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
@@ -215,7 +216,7 @@ private:
                 if (!skip) {
                     Texture texture;
                     string fullPath = directory + '/' + string(str.C_Str());
-                    texture.id = TextureFromFile(fullPath.c_str(),directory);
+                    texture.id = TextureFromFile(fullPath);
                     texture.type = typeName;
                     texture.path = str.C_Str();
                     textures.push_back(texture);

@@ -27,6 +27,7 @@ public:
     Model() = default;
     Model(const std::string& path, bool gamma = false);
 
+
     // Rendering
     void Draw(Shader &shader);
 

@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 #include "../../third_party/imageprocessing/stb_image.h"
 #include "../Shader/ShaderSetup.h"
-#include "GlobalDef.h"
 
 struct HeightMap {
     // CPU-side

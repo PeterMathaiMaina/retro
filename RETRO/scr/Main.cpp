@@ -17,9 +17,7 @@
 #include "graphics/Mesh.hpp"
 #include "../textureLoader/textureLoader.hpp"
 #include "graphics/Model.h"
-#include "core/CleanUp.h"
 #include "core/ShaderManager.hpp"
-#include "core/GlobalDef.h"
 #include "AssetManager/AssetManager.h"
 #include "Headers/Callbacks.h"
 #include <bitset>
@@ -54,8 +52,8 @@ int main() {
         BackEnd::SwapBuffers();
         BackEnd::PollEvents();
     }
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    std::cout<<AssetManager::AssetsToLoad.size()<<std::endl;
+    // std::this_thread::sleep_for(std::chrono::seconds(2));
+    // std::cout<<AssetManager::AssetsToLoad.size()<<std::endl;
 
 
     while (BackEnd::WindowIsOpen()) {

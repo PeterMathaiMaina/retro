@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "../AssetManager/AssetManager.h"
 
 // Constructor
 Model::Model(const std::string& path, bool gamma)
@@ -136,6 +137,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
+    // std::cout << "LOADING THE MODEL TEXTURES" << typeName <<std::endl;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
@@ -153,12 +155,21 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         if (!skip) {
             Texture texture;
             std::string fullPath = directory + '/' + std::string(str.C_Str());
-            texture.id = TextureFromFile(fullPath); // <-- goes through textureLoader
+            texture.id = TextureFromFile(fullPath);
             texture.type = typeName;
-            texture.path = str.C_Str();
+            texture.path = fullPath; // store full absolute path for uniqueness
+
+            // ---- Register with AssetManager ----
+            if (AssetManager::TexturesByPath.find(fullPath) == AssetManager::TexturesByPath.end()) {
+                AssetManager::TexturesByPath[fullPath] = texture;
+                AssetManager::g_textures.push_back(texture);
+            }
+
             textures.push_back(texture);
             textures_loaded.push_back(texture);
         }
+
+
     }
     return textures;
 }

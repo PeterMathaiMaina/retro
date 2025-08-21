@@ -17,7 +17,7 @@ unsigned int TextureFromFile(const std::string& fullPath)
         throw std::runtime_error("TextureFromFile requires an absolute path: " + fullPath);
     }
 
-    std::cout << "[Loading Texture] " << texPath.generic_string() << std::endl;
+    std::cout <<  texPath.generic_string() << std::endl;
 
     std::string ext = texPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);

@@ -21,10 +21,21 @@ struct Vertex {
 	float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+
 struct Texture {
-    unsigned int id;
-    string type;
-    string path;
+    GLuint id = 0;           // OpenGL texture ID
+    std::string type;        // diffuse, specular, normal, height, etc.
+    std::string path;        // full path to the texture file
+
+    int width = 0;           // width in pixels
+    int height = 0;          // height in pixels
+    int channels = 0;        // color channels (RGB = 3, RGBA = 4)
+
+    Texture() = default;
+
+    Texture(GLuint texID, const std::string& texType, const std::string& texPath,
+            int w = 0, int h = 0, int ch = 0)
+        : id(texID), type(texType), path(texPath), width(w), height(h), channels(ch) {}
 };
 
 class Mesh {

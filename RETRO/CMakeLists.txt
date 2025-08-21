@@ -53,6 +53,7 @@ add_executable(RETRO2025
     scr/Headers/callbacks.cpp
     textureLoader/textureLoader.cpp
     scr/Shader/ShaderSetup.cpp
+    scr/graphics/Model.cpp
 )
 
 

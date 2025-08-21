@@ -37,9 +37,9 @@ void Game::Render()
     Renderer::Renderscene();
 }
 void Game::RenderLoadingScreen(float progress) {
-    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    // Loading screen background = dark blue
+    glClearColor(0.5f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // For now, just draw a simple progress bar using immediate mode
     glBegin(GL_QUADS);
         glColor3f(0.2f, 0.8f, 0.3f);

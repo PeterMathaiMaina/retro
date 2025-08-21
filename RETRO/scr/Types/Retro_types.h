@@ -2,11 +2,11 @@
 
 const unsigned int GetscrWIDTH()
 {
-    return 2000;
+    return 1600;
 }
 const unsigned int GetscrHEIGHT()
 {
-    return 1200;
+    return 1000;
 }
 const unsigned int GetsdhWIDTH()
 {

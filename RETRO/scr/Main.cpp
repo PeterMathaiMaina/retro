@@ -16,7 +16,7 @@
 #include "Camera/Camera.hpp"
 #include "graphics/Mesh.hpp"
 #include "../textureLoader/textureLoader.hpp"
-#include "graphics/Model.hpp"
+#include "graphics/Model.h"
 #include "core/CleanUp.h"
 #include "core/ShaderManager.hpp"
 #include "core/GlobalDef.h"
@@ -50,14 +50,13 @@ int main() {
     while (BackEnd::WindowIsOpen() && !AssetManager::LoadingComplete()){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         AssetManager::UpdateLoading();
-        // std::cout<<"shit"<<std::endl;
         Retro.RenderLoadingScreen(AssetManager::GetProgress());
         BackEnd::SwapBuffers();
         BackEnd::PollEvents();
     }
-    std::cout<<"shit"<<std::endl;
-    std::cout<<"shit"<<std::endl;
-    std::cout<<"shit"<<std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::cout<<AssetManager::AssetsToLoad.size()<<std::endl;
+
 
     while (BackEnd::WindowIsOpen()) {
         float currentFrame = glfwGetTime();

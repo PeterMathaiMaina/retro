@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "../graphics/Model.hpp"
+#include "../graphics/Model.h"
 
 namespace globals {
     extern Shader* HouseShader;

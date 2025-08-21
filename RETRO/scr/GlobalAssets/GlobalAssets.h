@@ -1,6 +1,6 @@
 #pragma once
 #include "../core/ShaderManager.hpp"
-#include "../graphics/Model.hpp"
+#include "../graphics/Model.h"
 #include <GL/glew.h>
 
 class GlobalAssets {

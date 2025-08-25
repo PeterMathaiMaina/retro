@@ -1,35 +1,55 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include "Input.h"
 #include <iostream>
-#include "../core/Shader.hpp"
-#include "../../third_party/imageprocessing/stb_image.h"
-#include "../../third_party/glm/glm.hpp"
-#include "../../third_party/glm/gtc/matrix_transform.hpp"
-#include "../../third_party/glm/gtc/type_ptr.hpp"
-#include <iostream>
 
-void Input::processInput(GLFWwindow* window,float& deltaTime ,Camera& camera,bool &flashlightTogglePressed,bool &flashlightOn) {
-    //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !flashlightTogglePressed) {
-        flashlightTogglePressed = true;
-        flashlightOn = !flashlightOn;  
-        std::cout << "Flashlight : " << (flashlightOn ? "ON" : "OFF") << std::endl;
-    }
+void Input::Init(GLFWwindow* window) {
+    glfwSetCursorPosCallback(window, MouseCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    std::cout << "CALLBACKS ARE LOCKING IN" << std::endl;
+}
+void Input::ProcessKeyboard(Camera& camera, float deltaTime) {
+    float speed = 5.0f * deltaTime;
 
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE) {
-        flashlightTogglePressed = false;
-    }
+    if (glfwGetKey(BackEnd::GetWindow(), GLFW_KEY_W) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() + camera.GetForward() * speed);
 
+    if (glfwGetKey(BackEnd::GetWindow(),GLFW_KEY_S) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() - camera.GetForward() * speed);
+
+    if (glfwGetKey(BackEnd::GetWindow(), GLFW_KEY_A) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() - camera.GetRight() * speed);
+
+    if (glfwGetKey(BackEnd::GetWindow(), GLFW_KEY_D) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() + camera.GetRight() * speed);
+
+    if (glfwGetKey(BackEnd::GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() + camera.GetUp() * speed);
+
+    if (glfwGetKey(BackEnd::GetWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        camera.SetPosition(camera.GetPosition() - camera.GetUp() * speed);
 }
 
+
+double Input::GetMouseOffsetX() {
+    double x = mouseOffsetX;
+    mouseOffsetX = 0.0; // reset after read
+    return x;
+}
+
+double Input::GetMouseOffsetY() {
+    double y = mouseOffsetY;
+    mouseOffsetY = 0.0; // reset after read
+    return y;
+}
+
+void Input::MouseCallback(GLFWwindow* window, double xpos, double ypos) {
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    mouseOffsetX = xpos - lastX;
+    mouseOffsetY = lastY - ypos; // inverted y (OpenGL coords)
+    lastX = xpos;
+    lastY = ypos;
+}

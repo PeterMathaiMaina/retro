@@ -24,10 +24,10 @@
 #include "Shader/ShaderSetup.h"
 #include "Game/Game.h"
 #include "BackEnd/BackEnd.h"
-#include "Types/Retro_types.h"
+#include "Types/GlobalFunctions.h"
+#include "CAMERA/Camera.h"
 
 
-Camera camera(glm::vec3(0.0f, 0.3f, 1.2f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
 float lastFrame{};
 
 namespace FlashLight {
@@ -45,6 +45,9 @@ int main() {
         std::cerr << "Engine failed to start!\n";
         return -1;
     }
+    ShaderManager::Init();
+    Input::Init(BackEnd::GetWindow());
+
     while (BackEnd::WindowIsOpen() && !AssetManager::LoadingComplete()){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         AssetManager::UpdateLoading();
@@ -52,15 +55,12 @@ int main() {
         BackEnd::SwapBuffers();
         BackEnd::PollEvents();
     }
-    // std::this_thread::sleep_for(std::chrono::seconds(2));
-    // std::cout<<AssetManager::AssetsToLoad.size()<<std::endl;
-
 
     while (BackEnd::WindowIsOpen()) {
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Retro.ProcessInput(deltaTime);

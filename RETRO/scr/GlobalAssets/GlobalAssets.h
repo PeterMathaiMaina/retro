@@ -1,19 +1,13 @@
-#pragma once
-#include "../core/ShaderManager.hpp"
-#include "../graphics/Model.h"
-#include <GL/glew.h>
+#ifndef GLOBALASSETS_H
+#define GLOBALASSETS_H
 
-class GlobalAssets {
-public:
-    static void Init();
-    static void Shutdown();
+#include "../CAMERA/Camera.h"
 
-    // Declarations only (no = nullptr here!)
-    static Shader* CubeShader;
-    static Shader* TreeShader;
-    static Shader* BunnyShader;
-    static Shader* HeightMapShader;
-    static Shader* LightingCubeShader;
-    static Shader* HouseShader;
-    static Shader* HDRShader;
+struct GlobalAssets {
+    static Camera& GetCamera();
+
+private:
+    static Camera m_camera;
 };
+
+#endif

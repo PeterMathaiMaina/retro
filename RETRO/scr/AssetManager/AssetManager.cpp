@@ -6,6 +6,7 @@ std::vector<Texture> AssetManager::g_textures;
 std::map<std::string, Texture> AssetManager::TexturesByPath;
 // std::map<std::string,GLuint> AssetManager::GPUTextureIDsByPath;
 std::map<std::string,Model> AssetManager::Models;
+std::map<std::string,Shader> AssetManager::Shaders;
 size_t AssetManager::CurrentAssetIndex = 0;
 void AssetManager::Init(){
     AssetManager::QueueAssets();
@@ -19,7 +20,7 @@ void AssetManager::QueueAssets() {
         {AssetType::Model,   "BunnyModel", "/home/peter/retro/RETRO/rescources/models_raw/bunny/scene.gltf"},
         {AssetType::Model,   "HouseModel", "/home/peter/retro/RETRO/rescources/models_raw/House1/House.obj"},
         //RETRO/rescources/models_raw/House1/House.obj
-        // {AssetType::Shader,  "DefaultShader","shaders/default.vert" },
+        {AssetType::Shader,  "DefaultShader","shaders/default.vert" },
     };
     CurrentAssetIndex = 0;
 }
@@ -72,13 +73,16 @@ void AssetManager::UpdateLoading() {
             break;
         }
         case AssetType::Shader:{
+            // Shader shader(job.vertexPath,job.fragmentPath,job.GeometryPath);
+            // std::cout << "shader laoded : " << job.name<<std::endl;
+            // Shaders[job.name] = shader;
             break;
         }
     }
     CurrentAssetIndex++;
 }
 
-Model* AssetManager::GetTextureModelbyname(const std::string& name){
+Model* AssetManager::GetModelbyname(const std::string& name){
     auto it = Models.find(name);
     if(it!=Models.end()){
         return &it->second;

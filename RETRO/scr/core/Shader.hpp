@@ -16,6 +16,7 @@ struct Shader
 
     // Constructor generates the shader on the fly
     Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath);
+    Shader() = default;
     
     // Activate the shader program
     void use();

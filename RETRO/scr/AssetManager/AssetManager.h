@@ -17,10 +17,18 @@ enum class AssetType {
     Shader
 };
 
+
 struct AssetJob {
     AssetType type;
-    std::string name;   // key used in maps
-    std::string path;   // file path
+    std::string name;
+
+    // for model / texture
+    std::string path;  
+
+    // for shader
+    const char* vertexPath;
+    const char* fragmentPath;
+    const char* GeometryPath;
 };
 
 
@@ -29,6 +37,7 @@ public:
     static std::vector<AssetJob> AssetsToLoad;
     static std::vector<std::string>LoadedModelTextures;
     static std::map<std::string,Model> Models;
+    static std::map<std::string,Shader> Shaders;
     static std::map<std::string, GLuint> GPUTextureIDs;
     static std::vector<Texture> g_textures;
     static std::map<std::string, Texture> TexturesByPath;
@@ -43,7 +52,7 @@ public:
     static void FindAssetPaths();
     static unsigned int GetTextureIDbyname(const std::string& name);
     static unsigned int GetTextureIDbyPath(const std::string& path);
-    static Model* GetTextureModelbyname(const std::string& name);
+    static Model* GetModelbyname(const std::string& name);
     static GLuint GetOrLoadTexture(const std::string& path);
     ~AssetManager();
 private:

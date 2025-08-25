@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <string>
+// #include "../Camera/Camera.hpp"
+// #include "../CAMERA/Camera.h
 
 struct BackEnd{
     static bool InitGLFWWindow(int width,int height,const std::string& title);
@@ -12,6 +14,8 @@ struct BackEnd{
 
 
     static GLFWwindow* GetWindow();
+
+    // static Camera* GetCamera();
 
 
 private:
